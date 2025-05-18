@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>통합과학 OX & 빈칸 채우기 퀴즈 (1-117번)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .question-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .question-text .blank-emphasis { /* 빈칸 강조 스타일 */
+            font-weight: bold;
+            color: #3b82f6; /* Tailwind blue-500 */
+        }
+        .option-label {
+            display: block;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            background-color: #f7fafc;
+        }
+        .option-label:hover {
+            background-color: #e2e8f0;
+        }
+        .option-input:checked + .option-label {
+            background-color: #4299e1;
+            color: white;
+            border-color: #2b6cb0;
+        }
+        .feedback {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+        .feedback.correct {
+            background-color: #c6f6d5;
+            color: #2f855a;
+            border: 1px solid #9ae6b4;
+        }
+        .feedback.incorrect {
+            background-color: #fed7d7;
+            color: #c53030;
+            border: 1px solid #fbb6ce;
+        }
+        .explanation {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+        .action-button {
+            background-color: #4a5568;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: none;
+            margin-top: 1rem;
+            margin-right: 0.5rem;
+        }
+        .action-button:hover:not(:disabled) {
+            background-color: #2d3748;
+        }
+        .action-button:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+        .pagination-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        .pagination-controls button, .pagination-controls span {
+            margin: 0 0.25rem;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        .pagination-controls button:disabled {
+            background-color: #e2e8f0;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .pagination-controls .page-number.current {
+            background-color: #4299e1;
+            color: white;
+            border-color: #2b6cb0;
+            font-weight: bold;
+        }
+        .score-section {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #e9f5ff;
+            border-radius: 8px;
+            text-align: left;
+        }
+        .score-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+        }
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a202c;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .page-info {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>통합과학 OX & 빈칸 채우기 퀴즈</h1>
+        <div class="page-info" id="page-info"></div>
+        <div id="quiz">
+            </div>
+        <div class="pagination-controls" id="pagination-controls">
+            </div>
+        <button id="submit-page-btn" class="action-button w-full sm:w-auto mx-auto block">이번 페이지 채점하기</button>
+        <div class="score-section" id="score-section" style="display: none;">
+            <p class="score-text" id="current-page-score-text"></p>
+            <p class="score-text" id="total-score-text"></p>
+        </div>
+    </div>
+
+    <script>
+        // 문제 데이터 (1번부터 117번까지 전체 문제)
+        const questions = [
+            {
+                id: 1, type: 'fill-in', text: "1. 자연 현상을 탐구할 때 측정 대상의 (   )를 고려해야 한다.", answer: "규모", options: ["규모", "속도", "색깔", "온도"],
+                explanation: "자연 현상을 탐구할 때는 관찰하거나 측정하려는 대상의 크기나 범위, 즉 규모를 고려해야 합니다. 예를 들어, 세포의 크기를 측정하는 것과 지구의 크기를 측정하는 것은 다른 접근 방식이 필요합니다."
+            },
+            {
+                id: 2, type: 'fill-in', text: "2. (   )에 따라 측정 방법이 다르다.", answer: "규모", options: ["규모", "시간", "장소", "목표"],
+                explanation: "측정 대상의 규모에 따라 적절한 측정 도구와 방법이 달라집니다. 예를 들어, 아주 작은 물체의 길이를 잴 때는 마이크로미터나 전자 현미경을 사용하고, 큰 거리를 측정할 때는 GPS나 레이저 거리 측정기를 사용합니다."
+            },
+            {
+                id: 3, type: 'fill-in', text: "3. 적혈구는 (   )세계의 규모를 갖는 대상이다.", answer: "미시", options: ["미시", "거시", "일상", "우주"],
+                explanation: "미시 세계는 원자, 분자, 세포와 같이 우리 눈으로 직접 볼 수 없는 매우 작은 규모의 세계를 말합니다. 적혈구는 현미경으로 관찰해야 하는 미시 세계의 대상입니다."
+            },
+            {
+                id: 4, type: 'fill-in', text: "4. 동전은 (   )세계의 규모를 갖는 대상이다.", answer: "거시", options: ["거시", "미시", "초미시", "가상"],
+                explanation: "거시 세계는 우리가 일상생활에서 직접 경험하고 눈으로 볼 수 있는 규모의 세계를 말합니다. 동전, 책, 건물 등은 거시 세계의 대상입니다."
+            },
+            {
+                id: 5, type: 'fill-in', text: "5. 자연 세계에서 (   ) 수준의 아주 작은 규모를 미시 세계라 한다.", answer: "원자", options: ["원자", "분자", "은하", "세포"],
+                explanation: "미시 세계는 원자나 전자와 같이 물질을 구성하는 기본 입자들의 수준을 다룹니다. 자연 세계에서 원자 수준의 아주 작은 규모를 미시 세계라고 합니다."
+            },
+            {
+                id: 6, type: 'ox', text: "6. 규모에 따라 측정하는 방법은 다르다.", answer: "O", options: ["O", "X"],
+                explanation: "맞습니다. 측정 대상의 규모가 매우 작거나 매우 클 경우, 또는 측정하려는 물리량이 특수할 경우 그에 맞는 다양한 측정 방법과 도구가 사용됩니다."
+            },
+            {
+                id: 7, type: 'fill-in', text: "7. DVD 지름의 단위로 적절한 것은 (   )이다.", answer: "cm", options: ["cm", "m", "μm", "km"],
+                explanation: "DVD의 지름은 보통 센티미터(cm) 단위로 표현하는 것이 적절합니다. 1cm는 0.01m입니다."
+            },
+            {
+                id: 8, type: 'fill-in', text: "8. 적혈구 크기의 단위로 적절한 것은 (   )이다.", answer: "μm", options: ["μm", "nm", "cm", "mm"],
+                explanation: "적혈구의 크기는 매우 작아 마이크로미터(μm) 단위를 사용합니다. 1μm는 1미터의 백만분의 일 (10<sup>-6</sup>m)입니다."
+            },
+            {
+                id: 9, type: 'fill-in', text: "9. 과거의 시간을 측정한 방법은 (   )의 위치나 달의 모양 변화를 썼다.", answer: "태양", options: ["태양", "별", "인공위성", "바람"],
+                explanation: "과거에는 해의 위치 변화를 이용한 해시계나 달의 모양 변화를 기준으로 한 음력을 사용하여 시간을 측정했습니다."
+            },
+            {
+                id: 10, type: 'fill-in', text: "10. 조선 시대에는 (   )를 이용해 태양의 위치 변화에 따른 그림자의 길이로 시간을 측정하였다.", answer: "앙부일구", options: ["앙부일구", "자격루", "혼천의", "측우기"],
+                explanation: "앙부일구는 조선 세종 때 만들어진 대표적인 해시계로, 태양의 그림자를 이용하여 시간과 절기를 알 수 있도록 한 과학적인 장치입니다."
+            },
+            {
+                id: 11, type: 'fill-in', text: "11. 과거에는 손가락 마디, 발걸음의 폭 등으로 (   )를 측정하였다.", answer: "길이", options: ["길이", "무게", "시간", "온도"],
+                explanation: "과거에는 표준화된 측정 도구가 발달하기 전이어서, 사람들은 자신의 신체 일부(예: 뼘, 발)나 주변의 물건을 기준으로 길이를 어림하여 측정했습니다."
+            },
+            {
+                id: 12, type: 'ox', text: "12. 현대에는 정밀하게 시간을 측정하기 위해 빛이 왕복한 시간을 이용한다.", answer: "X", options: ["O", "X"],
+                explanation: "현대에는 정밀하게 시간을 측정하기 위해 '세슘 원자시계'를 이용합니다. 빛이 왕복한 시간을 이용하는 것은 '길이'를 정밀하게 측정하는 방법입니다."
+            },
+            {
+                id: 13, type: 'fill-in', text: "13. 현대에는 정밀하게 시간을 측정하기 위해 (   )를 이용한다.", answer: "세슘 원자시계", options: ["세슘 원자시계", "모래시계", "해시계", "GPS 수신기"],
+                explanation: "세슘 원자시계는 세슘 원자가 특정 주파수의 전자기파를 흡수하거나 방출하는 현상을 이용하여 매우 정확하게 시간을 측정하는 장치입니다."
+            },
+            {
+                id: 14, type: 'fill-in', text: "14. 의학이나 반도체 같은 분야가 발전할 수 있던 까닭은 (   ) 규모를 측정하면서이다.", answer: "작은", options: ["작은", "큰", "일정한", "변화하는"],
+                explanation: "의학(세포, 바이러스 관찰 등)이나 반도체(미세 회로 제작 등) 분야는 매우 작은 규모의 세계를 정밀하게 측정하고 제어하는 기술이 발전하면서 함께 발전했습니다."
+            },
+            {
+                id: 15, type: 'fill-in', text: "15. 항공 우주 분야가 발전할 수 있던 까닭은 (   ) 규모를 측정하면서이다.", answer: "큰", options: ["큰", "작은", "평균적인", "알 수 없는"],
+                explanation: "항공 우주 분야는 지구의 크기, 행성 간의 거리, 우주의 넓이와 같이 매우 큰 규모를 정확하게 측정하고 이해하는 기술이 발전하면서 함께 발전했습니다."
+            },
+            {
+                id: 16, type: 'fill-in', text: "16. 현대에는 빛이 왕복한 시간을 이용하여 (   )를 측정한다.", answer: "길이", options: ["길이", "시간", "질량", "온도"],
+                explanation: "현대의 길이 표준은 빛이 진공에서 특정 시간 동안 진행한 거리로 정의됩니다. 따라서 빛이 왕복한 시간을 측정하면 거리를 매우 정밀하게 알 수 있습니다."
+            },
+            {
+                id: 17, type: 'fill-in', text: "17. 빛의 속력을 3 × 10<sup>8</sup> m/s 이라 할 때 A부터 B까지 빛이 왕복하는데 걸린 시간이 4초라면 측정한 길이는? (   )m", answer: "6 × 10⁸", options: ["6 × 10⁸", "12 × 10⁸", "3 × 10⁸", "1.5 × 10⁸"],
+                explanation: "빛이 A에서 B까지 갔다가 다시 A로 돌아오는 데 4초 걸렸으므로, A에서 B까지 가는 데 걸린 시간은 2초입니다. 거리 = 속력 × 시간이므로, 길이는 (3 × 10<sup>8</sup> m/s) × 2s = 6 × 10<sup>8</sup> m 입니다."
+            },
+            {
+                id: 18, type: 'ox', text: "18. 세슘 원자시계는 오랜 시간이 지나도 오차가 발생하지 않는다.", answer: "X", options: ["O", "X"],
+                explanation: "세슘 원자시계는 매우 정밀하지만, 극히 미미하게나마 오차가 발생할 수 있습니다. 다만 그 오차가 수천만 년에 1초 정도로 매우 작습니다."
+            },
+            {
+                id: 19, type: 'fill-in', text: "19. 세슘 원자시계는 빛의 (   )를 이용하여 시간을 측정한다.", answer: "진동수", options: ["진동수", "세기", "색깔", "온도"],
+                explanation: "세슘 원자시계는 세슘-133 원자가 특정 조건에서 방출하거나 흡수하는 전자기파의 정확한 진동수를 기준으로 시간을 측정합니다."
+            },
+            {
+                id: 20, type: 'fill-in', text: "20. 태양의 위치 변화와 달의 모양 변화를 통해 측정할 수 있는 것은 (   )이다.", answer: "시간", options: ["시간", "길이", "무게", "부피"],
+                explanation: "과거 사람들은 하루 동안 태양의 위치가 주기적으로 변하는 것과 한 달 동안 달의 모양이 주기적으로 변하는 것을 관찰하여 시간의 흐름을 파악하고 달력 등을 만들었습니다."
+            },
+            {
+                id: 21, type: 'fill-in', text: "21. 10<sup>1</sup>의 접두어는 (   )로 기호는 da를 쓴다.", answer: "데카", options: ["데카", "데시", "킬로", "헥토"],
+                explanation: "10<sup>1</sup>을 나타내는 SI 접두어는 '데카(deca)'이고, 기호는 'da'입니다. 예를 들어 1데카미터(dam)는 10미터입니다."
+            },
+            {
+                id: 22, type: 'fill-in', text: "22. 10<sup>2</sup>의 접두어는 (   )로 기호는 h를 쓴다.", answer: "헥토", options: ["헥토", "킬로", "메가", "데카"],
+                explanation: "10<sup>2</sup>를 나타내는 SI 접두어는 '헥토(hecto)'이고, 기호는 'h'입니다. 예를 들어 1헥토파스칼(hPa)은 100파스칼입니다."
+            },
+            {
+                id: 23, type: 'fill-in', text: "23. 10<sup>3</sup>의 접두어는 (   )로 기호는 k를 쓴다.", answer: "킬로", options: ["킬로", "메가", "기가", "헥토"],
+                explanation: "10<sup>3</sup>을 나타내는 SI 접두어는 '킬로(kilo)'이고, 기호는 'k'입니다. 예를 들어 1킬로그램(kg)은 1000그램입니다."
+            },
+            {
+                id: 24, type: 'fill-in', text: "24. 10<sup>6</sup>의 접두어는 (   )로 기호는 M를 쓴다.", answer: "메가", options: ["메가", "기가", "테라", "킬로"],
+                explanation: "10<sup>6</sup>을 나타내는 SI 접두어는 '메가(mega)'이고, 기호는 'M'입니다. 예를 들어 1메가바이트(MB)는 10<sup>6</sup>바이트입니다."
+            },
+            {
+                id: 25, type: 'fill-in', text: "25. 10<sup>9</sup>의 접두어는 (   )로 기호는 G를 쓴다.", answer: "기가", options: ["기가", "테라", "메가", "킬로"],
+                explanation: "10<sup>9</sup>를 나타내는 SI 접두어는 '기가(giga)'이고, 기호는 'G'입니다. 예를 들어 1기가헤르츠(GHz)는 10<sup>9</sup>헤르츠입니다."
+            },
+            {
+                id: 26, type: 'fill-in', text: "26. 10<sup>12</sup>의 접두어는 (   )로 기호는 T를 쓴다.", answer: "테라", options: ["테라", "기가", "페타", "메가"],
+                explanation: "10<sup>12</sup>를 나타내는 SI 접두어는 '테라(tera)'이고, 기호는 'T'입니다. 예를 들어 1테라바이트(TB)는 10<sup>12</sup>바이트입니다."
+            },
+            {
+                id: 27, type: 'fill-in', text: "27. 200Mm는 (   ) km 이다.", answer: "200000", options: ["200000", "20000", "200", "0.2"],
+                explanation: "Mm는 메가미터로 10<sup>6</sup>m를 의미하고, km는 킬로미터로 10<sup>3</sup>m를 의미합니다. 따라서 1Mm = 1000km 입니다. 200Mm = 200 × 1000km = 200000km입니다."
+            },
+            {
+                id: 28, type: 'fill-in', text: "28. 200Mm는 (   ) Gm 이다.", answer: "0.2", options: ["0.2", "2", "20", "2000"],
+                explanation: "Mm는 메가미터(10<sup>6</sup>m), Gm는 기가미터(10<sup>9</sup>m)입니다. 1Gm = 1000Mm 이므로, 1Mm = 0.001Gm 입니다. 따라서 200Mm = 200 × 0.001Gm = 0.2Gm입니다."
+            },
+            {
+                id: 29, type: 'fill-in', text: "29. 10<sup>-1</sup>의 접두어는 (   )로 기호는 d를 쓴다.", answer: "데시", options: ["데시", "센티", "밀리", "데카"],
+                explanation: "10<sup>-1</sup>을 나타내는 SI 접두어는 '데시(deci)'이고, 기호는 'd'입니다. 예를 들어 1데시리터(dL)는 0.1리터입니다."
+            },
+            {
+                id: 30, type: 'fill-in', text: "30. 10<sup>-2</sup>의 접두어는 (   )로 기호는 c를 쓴다.", answer: "센티", options: ["센티", "밀리", "마이크로", "데시"],
+                explanation: "10<sup>-2</sup>를 나타내는 SI 접두어는 '센티(centi)'이고, 기호는 'c'입니다. 예를 들어 1센티미터(cm)는 0.01미터입니다."
+            },
+            {
+                id: 31, type: 'fill-in', text: "31. 10<sup>-3</sup>의 접두어는 (   )로 기호는 m를 쓴다.", answer: "밀리", options: ["밀리", "마이크로", "나노", "센티"],
+                explanation: "10<sup>-3</sup>을 나타내는 SI 접두어는 '밀리(milli)'이고, 기호는 'm'입니다. 예를 들어 1밀리그램(mg)은 0.001그램입니다."
+            },
+            {
+                id: 32, type: 'fill-in', text: "32. 10<sup>-6</sup>의 접두어는 (   )로 기호는 μ를 쓴다.", answer: "마이크로", options: ["마이크로", "나노", "피코", "밀리"],
+                explanation: "10<sup>-6</sup>을 나타내는 SI 접두어는 '마이크로(micro)'이고, 기호는 'μ'입니다. 예를 들어 1마이크로미터(μm)는 10<sup>-6</sup>미터입니다."
+            },
+            {
+                id: 33, type: 'ox', text: "33. 밀리와 마이크로의 접두어는 동일하다.", answer: "X", options: ["O", "X"],
+                explanation: "밀리(milli)는 10<sup>-3</sup>을 나타내고, 마이크로(micro)는 10<sup>-6</sup>을 나타냅니다. 따라서 두 접두어는 다릅니다."
+            },
+            {
+                id: 34, type: 'fill-in', text: "34. 10<sup>-9</sup>의 접두어는 (   )로 n를 쓴다.", answer: "나노", options: ["나노", "피코", "마이크로", "밀리"],
+                explanation: "10<sup>-9</sup>를 나타내는 SI 접두어는 '나노(nano)'이고, 기호는 'n'입니다. 예를 들어 1나노미터(nm)는 10<sup>-9</sup>미터입니다."
+            },
+            {
+                id: 35, type: 'fill-in', text: "35. 10<sup>-12</sup>의 접두어는 (   )로 p를 쓴다.", answer: "피코", options: ["피코", "나노", "펨토", "마이크로"],
+                explanation: "10<sup>-12</sup>를 나타내는 SI 접두어는 '피코(pico)'이고, 기호는 'p'입니다. 예를 들어 1피코초(ps)는 10<sup>-12</sup>초입니다."
+            },
+            {
+                id: 36, type: 'fill-in', text: "36. 1nm는 1/(10<sup>9</sup>)m 이다.", answer: "10⁹", options: ["10⁹", "10⁶", "10³", "10¹²"],
+                explanation: "나노(nano)는 10<sup>-9</sup>를 의미하므로, 1nm는 10<sup>-9</sup>m와 같습니다. 이는 1/10<sup>9</sup>m와 동일합니다."
+            },
+            {
+                id: 37, type: 'fill-in', text: "37. 1t는 (   )의 단위로 1000kg과 같다.", answer: "질량", options: ["질량", "무게", "부피", "길이"],
+                explanation: "t(톤)은 질량의 단위로, 1t은 1000kg과 같습니다. 무게는 질량에 중력 가속도가 곱해진 힘의 크기를 의미합니다."
+            },
+            {
+                id: 38, type: 'fill-in', text: "38. 기본량 7가지에는 시간, 길이, 질량, 전류, 온도, (   ), 광도가 있다.", answer: "물질량", options: ["물질량", "부피", "속도", "힘"],
+                explanation: "국제단위계(SI)의 7가지 기본량은 시간(초, s), 길이(미터, m), 질량(킬로그램, kg), 전류(암페어, A), 열역학적 온도(켈빈, K), 물질량(몰, mol), 광도(칸델라, cd)입니다."
+            },
+            {
+                id: 39, type: 'ox', text: "39. 기본량의 단위는 1가지 뿐이다.", answer: "X", options: ["O", "X"],
+                explanation: "각 기본량은 국제단위계(SI)에서 정한 기본 단위를 가집니다. 예를 들어 길이의 기본 단위는 미터(m)이지만, 센티미터(cm), 킬로미터(km) 등 다양한 단위를 사용할 수 있습니다. 그러나 SI 기본 단위는 각 물리량마다 하나로 정의됩니다."
+            },
+            {
+                id: 40, type: 'fill-in', text: "40. 길이의 기본 단위는 (   )이다.", answer: "m", options: ["m", "cm", "km", "mm"],
+                explanation: "국제단위계(SI)에서 길이의 기본 단위는 미터(m)입니다."
+            },
+            {
+                id: 41, type: 'ox', text: "41. 길이의 단위로 ft(피트)를 쓸 수 있다.", answer: "O", options: ["O", "X"],
+                explanation: "ft(피트)는 길이를 나타내는 단위 중 하나로, 주로 영미권에서 사용됩니다. SI 기본 단위는 아니지만 특정 상황이나 국가에서 사용될 수 있습니다."
+            },
+            {
+                id: 42, type: 'fill-in', text: "42. 온도의 기본 단위는 (K)이지만 우리나라에서는 주로 (   )를 쓴다.", answer: "℃", options: ["℃", "℉", "K", "R"],
+                explanation: "국제단위계(SI)에서 온도의 기본 단위는 켈빈(K)입니다. 하지만 일상생활에서 우리나라는 섭씨온도(℃)를 주로 사용하며, 미국 등에서는 화씨온도(℉)를 사용합니다."
+            },
+            {
+                id: 43, type: 'fill-in', text: "43. 기본량의 크기를 나타내거나 비교하기 위해 사용하는 것을 (   )라 한다.", answer: "단위", options: ["단위", "숫자", "기호", "법칙"],
+                explanation: "단위는 물리량의 크기를 측정하고 표현하기 위한 기준으로, 특정 물리량의 정해진 양을 나타냅니다. 예를 들어 길이의 단위에는 미터(m), 센티미터(cm) 등이 있습니다."
+            },
+            {
+                id: 44, type: 'fill-in', text: "44. 기본량으로부터 유도된 물리량을 (   )이라 한다.", answer: "유도량", options: ["유도량", "측정량", "상대량", "절대량"],
+                explanation: "유도량은 기본량들의 조합으로 정의되는 물리량입니다. 예를 들어 속력(길이/시간), 넓이(길이×길이), 밀도(질량/부피) 등이 유도량에 해당합니다."
+            },
+            {
+                id: 45, type: 'fill-in', text: "45. cm<sup>3</sup>, m<sup>3</sup>은 (   )의 단위이다.", answer: "부피", options: ["부피", "넓이", "길이", "질량"],
+                explanation: "cm<sup>3</sup>(세제곱센티미터)와 m<sup>3</sup>(세제곱미터)는 부피를 나타내는 단위입니다. 부피는 공간이 차지하는 크기를 의미합니다."
+            },
+            {
+                id: 46, type: 'fill-in', text: "46. km/h는 (   )의 단위이다.", answer: "속력", options: ["속력", "가속도", "거리", "시간"],
+                explanation: "km/h(킬로미터 매 시)는 단위 시간당 이동한 거리를 나타내는 속력의 단위입니다."
+            },
+            {
+                id: 47, type: 'fill-in', text: "47. mAh, Ah는 (   )의 단위이다.", answer: "배터리 용량", options: ["배터리 용량", "전압", "전력", "저항"],
+                explanation: "mAh(밀리암페어시)와 Ah(암페어시)는 전류와 시간의 곱으로, 주로 배터리가 저장할 수 있는 전하량 또는 배터리의 용량을 나타내는 단위입니다."
+            },
+            {
+                id: 48, type: 'fill-in', text: "48. %는 (   )의 단위이다.", answer: "농도", options: ["농도", "비율", "확률", "백분율"],
+                explanation: "%(퍼센트)는 전체에 대한 특정 성분의 양을 백분율로 나타내는 단위로, 용액의 농도 등을 표현할 때 사용됩니다. '비율'이나 '백분율'도 맞는 표현이지만, 과학적 맥락에서 특정 물질의 포함 정도를 나타낼 때 '농도'의 단위로 자주 쓰입니다."
+            },
+            {
+                id: 49, type: 'ox', text: "49. 넓이는 기본량인 길이만으로 만들 수 있는 유도량이다.", answer: "O", options: ["O", "X"],
+                explanation: "넓이는 가로 길이와 세로 길이의 곱으로 계산되므로 (길이 × 길이), 기본량인 길이만으로 유도되는 유도량입니다."
+            },
+            {
+                id: 50, type: 'ox', text: "50. 부피는 기본량인 길이만으로 만들 수 있는 유도량이다.", answer: "O", options: ["O", "X"],
+                explanation: "부피는 가로, 세로, 높이의 곱으로 계산되므로 (길이 × 길이 × 길이), 기본량인 길이만으로 유도되는 유도량입니다."
+            },
+            {
+                id: 51, type: 'fill-in', text: "51. 속력은 기본량 중 (   )와 시간의 조합으로 만들 수 있다.", answer: "길이", options: ["길이", "질량", "온도", "전류"],
+                explanation: "속력은 단위 시간당 이동한 거리로 정의되므로, 기본량인 길이(거리)와 시간의 조합으로 만들어지는 유도량입니다 (속력 = 길이/시간)."
+            },
+            {
+                id: 52, type: 'fill-in', text: "52. 가속도는 기본량 중 (   )와 시간의 조합으로 만들 수 있다.", answer: "길이", options: ["길이", "질량", "힘", "에너지"],
+                explanation: "가속도는 단위 시간당 속도의 변화량으로 정의되며, 속도는 다시 길이와 시간의 조합입니다. 따라서 가속도는 (길이/시간)/시간 = 길이/시간<sup>2</sup> 으로, 기본량인 길이와 시간의 조합으로 만들어집니다."
+            },
+            {
+                id: 53, type: 'fill-in', text: "53. 가속도의 단위는 (   )이다.", answer: "m/s²", options: ["m/s²", "m/s", "kg·m/s²", "N/m²"],
+                explanation: "가속도는 속도를 시간으로 나눈 값이므로, 속도의 단위(m/s)를 시간의 단위(s)로 나누어 m/s<sup>2</sup>(미터 매 초 제곱)이 됩니다."
+            },
+            {
+                id: 54, type: 'fill-in', text: "54. 밀도는 기본량 중 (   )과 길이의 조합으로 만들 수 있다.", answer: "질량", options: ["질량", "시간", "온도", "힘"],
+                explanation: "밀도는 단위 부피당 질량으로 정의됩니다 (밀도 = 질량/부피). 부피는 길이의 세제곱이므로, 밀도는 기본량인 질량과 길이의 조합으로 만들어집니다 (질량/길이<sup>3</sup>)."
+            },
+            {
+                id: 55, type: 'fill-in', text: "55. 밀도의 단위는 (   )이다.", answer: "kg/m³", options: ["kg/m³", "g/cm³", "kg/L", "모두 정답"],
+                explanation: "밀도의 SI 단위는 kg/m<sup>3</sup>(킬로그램 매 세제곱미터)입니다. g/cm<sup>3</sup>이나 kg/L도 밀도의 단위로 사용될 수 있으나, SI 기본 단위를 사용한 표현은 kg/m<sup>3</sup>입니다."
+            },
+            {
+                id: 56, type: 'fill-in', text: "56. 농도의 단위는 (mol/m<sup>3</sup>) 또는 (   )를 쓴다.", answer: "%", options: ["%", "M", "ppm", "g/L"],
+                explanation: "농도를 나타내는 단위는 다양합니다. 몰 농도(mol/m<sup>3</sup> 또는 mol/L (M)), 퍼센트 농도(%), ppm 등이 사용됩니다. 문제의 맥락상 %가 적절합니다."
+            },
+            {
+                id: 57, type: 'fill-in', text: "57. mol은 (   )의 단위이고, m<sup>3</sup>은 부피의 단위이다.", answer: "물질량", options: ["물질량", "질량", "개수", "농도"],
+                explanation: "mol(몰)은 물질의 양을 나타내는 SI 기본 단위인 물질량의 단위입니다. m<sup>3</sup>(세제곱미터)는 부피의 SI 단위입니다."
+            },
+            {
+                id: 58, type: 'ox', text: "58. 힘은 기본량이다.", answer: "X", options: ["O", "X"],
+                explanation: "힘은 기본량이 아니라 유도량입니다. 힘(F)은 질량(m)과 가속도(a)의 곱으로 정의됩니다 (F=ma). 질량은 기본량이지만, 가속도는 길이와 시간으로 유도되는 양입니다."
+            },
+            {
+                id: 59, type: 'fill-in', text: "59. 힘의 단위는 (   )이며 힘은 질량 × 가속도로 (kg·m/s<sup>2</sup>)이라는 단위를 써도 된다.", answer: "N", options: ["N", "J", "Pa", "W"],
+                explanation: "힘의 SI 단위는 뉴턴(N)입니다. 힘은 질량과 가속도의 곱이므로, 기본 단위로 표현하면 kg·m/s<sup>2</sup>이 되며, 1N = 1 kg·m/s<sup>2</sup> 입니다."
+            },
+            {
+                id: 60, type: 'fill-in', text: "60. 압력의 단위는 (N/m<sup>2</sup>) = (kg/m·s<sup>2</sup>) = (   )를 모두 쓸 수 있다.", answer: "Pa", options: ["Pa", "atm", "mmHg", "bar"],
+                explanation: "압력은 단위 면적당 작용하는 힘으로 정의됩니다. SI 단위는 파스칼(Pa)이며, 1 Pa = 1 N/m<sup>2</sup> 입니다. 이를 기본 단위로 풀면 kg/(m·s<sup>2</sup>)이 됩니다."
+            },
+            {
+                id: 61, type: 'fill-in', text: "61. 압력의 뜻은 단위 면적당 평균 (   )이다.", answer: "힘", options: ["힘", "질량", "에너지", "일"],
+                explanation: "압력은 특정 면적에 수직으로 작용하는 평균적인 힘의 크기를 그 면적으로 나눈 값입니다 (압력 = 힘/면적)."
+            },
+            {
+                id: 62, type: 'fill-in', text: "62. 10400mAh는 (   ) Ah 이다.", answer: "10.4", options: ["10.4", "1.04", "104", "0.104"],
+                explanation: "m(밀리)는 10<sup>-3</sup>을 의미하므로, 1mAh = 0.001Ah 입니다. 따라서 10400mAh = 10400 × 0.001 Ah = 10.4Ah 입니다."
+            },
+            {
+                id: 63, type: 'fill-in', text: "63. 자연 현상이나 우리 주변의 여러 현상을 설명하기 위해 필요한 기본적인 양을 (   )", answer: "기본량", options: ["기본량", "유도량", "물리량", "측정값"],
+                explanation: "기본량은 다른 물리량으로 정의되지 않고 독립적으로 정의되는 물리량으로, 과학적 측정과 설명의 기초가 됩니다. SI 기본량에는 7가지가 있습니다."
+            },
+            {
+                id: 64, type: 'ox', text: "64. 시간과 길이를 측정할 때는 규모와 관계 없이 동일한 방법을 사용해야한다.", answer: "X", options: ["O", "X"],
+                explanation: "시간과 길이를 측정할 때는 대상의 규모에 따라 적절한 방법과 도구를 사용해야 합니다. 예를 들어 원자의 크기를 재는 방법과 지구 둘레를 재는 방법은 다릅니다."
+            },
+            {
+                id: 65, type: 'ox', text: "65. 속력은 기본량 중 길이의 개념만을 이용해 설명할 수 있다.", answer: "X", options: ["O", "X"],
+                explanation: "속력은 단위 시간당 이동한 거리로, 기본량인 길이와 시간 두 가지 개념을 모두 이용하여 설명됩니다 (속력 = 길이/시간)."
+            },
+            {
+                id: 66, type: 'ox', text: "66. 같은 기본량을 서로 다른 단위로 나타내면 혼란을 일으킬 수 있다.", answer: "O", options: ["O", "X"],
+                explanation: "같은 물리량이라도 서로 다른 단위를 사용하면 값의 비교가 어렵고 오해가 발생할 수 있어 혼란을 야기할 수 있습니다. 이 때문에 국제단위계(SI)와 같은 표준화된 단위 체계가 중요합니다."
+            },
+            {
+                id: 67, type: 'ox', text: "67. 시간과 길이를 측정하는 방법은 변하지 않는다.", answer: "X", options: ["O", "X"],
+                explanation: "과학 기술이 발전함에 따라 시간과 길이를 측정하는 방법과 그 정밀도는 지속적으로 발전하고 변해왔습니다. 예를 들어 과거의 해시계에서 현대의 원자시계로 발전한 것이 그 예입니다."
+            },
+            {
+                id: 68, type: 'ox', text: "68. 파운드는 질량의 단위로 기본량의 기본 단위이다.", answer: "X", options: ["O", "X"],
+                explanation: "파운드(lb)는 질량의 단위로 사용되지만, 국제단위계(SI)의 기본 단위는 아닙니다. SI에서 질량의 기본 단위는 킬로그램(kg)입니다."
+            },
+            {
+                id: 69, type: 'fill-in', text: "69. [복자] GPS는 (   )의 약자이다.", answer: "위성위치확인시스템", options: ["위성위치확인시스템", "지구물리탐사시스템", "전지구측위시스템", "일반측량시스템"],
+                explanation: "GPS는 Global Positioning System의 약자로, 우리말로는 '위성 위치 확인 시스템' 또는 '전 지구 측위 시스템'으로 번역됩니다. 인공위성을 이용하여 지구상 물체의 위치를 정확하게 알아내는 시스템입니다."
+            },
+            {
+                id: 70, type: 'ox', text: "70. [복자] GPS는 넓은 영역에서 위치를 확인하기 때문에 미세한 이동거리는 측정하기 어렵다.", answer: "X", options: ["O", "X"],
+                explanation: "GPS 기술은 지속적으로 발전하여, 일반적인 GPS 수신기도 수 미터 이내의 오차로 위치를 측정할 수 있으며, 정밀 GPS(DGPS, RTK-GPS 등)를 사용하면 수 센티미터 수준의 미세한 이동 거리도 측정 가능합니다."
+            },
+            {
+                id: 71, type: 'fill-in', text: "71. [복자] GPS는 이론상 최소 (   )개의 위성이 필요하다.", answer: "3", options: ["3", "4", "5", "2"],
+                explanation: "3차원 공간에서 정확한 위치(위도, 경도, 고도)를 결정하고 시간 오차를 보정하기 위해서는 최소 4개의 위성으로부터 신호를 받아야 합니다. 다만, 고도를 무시하고 2차원 평면상의 위치만 결정한다면 이론적으로 3개의 위성으로도 가능합니다. 문제에서는 '이론상 최소'라고 하여 3개로 답할 수 있으나, 실제 안정적인 3D 위치 결정에는 4개가 필요합니다."
+            },
+            {
+                id: 72, type: 'fill-in', text: "72. [복자] 전자현미경은 (   ) 단위로 물체를 관찰한다.", answer: "나노미터", options: ["나노미터", "마이크로미터", "밀리미터", "센티미터"],
+                explanation: "전자현미경은 빛 대신 전자를 이용하여 물체를 확대 관찰하는 장치로, 광학현미경보다 훨씬 높은 배율과 분해능을 가집니다. 이를 통해 나노미터(nm, 10<sup>-9</sup>m) 단위의 매우 작은 구조까지 관찰할 수 있습니다."
+            },
+            {
+                id: 73, type: 'fill-in', text: "73. [복자] SI는 (   )의 약자이다.", answer: "국제단위계", options: ["국제단위계", "표준측정연구소", "과학정보시스템", "국제표준기구"],
+                explanation: "SI는 프랑스어 'Le Système International d'Unités'에서 유래한 약자로, 영어로는 'International System of Units', 우리말로는 '국제단위계'를 의미합니다. 전 세계적으로 통용되는 표준화된 측정 단위 체계입니다."
+            },
+            {
+                id: 74, type: 'fill-in', text: "74. (   )은 어떤 대상의 물리량을 기준이 되는 양과 비교해 수치와 단위로 나타내는 것", answer: "측정", options: ["측정", "어림", "분석", "관찰"],
+                explanation: "측정은 도구나 기기를 사용하여 어떤 물리량(길이, 질량, 시간 등)의 값을 정해진 기준(단위)과 비교하여 수치로 표현하는 과정입니다."
+            },
+            {
+                id: 75, type: 'fill-in', text: "75. (   )은 측정 도구 없이 어떠한 양을 추정하는 활동", answer: "어림", options: ["어림", "측정", "예측", "가설"],
+                explanation: "어림은 정확한 측정 도구를 사용하지 않고, 경험이나 직관에 의존하여 물리량의 크기를 대략적으로 짐작하거나 추정하는 것을 말합니다."
+            },
+            {
+                id: 76, type: 'ox', text: "76. 도구에 나타나는 값이나 그 값을 읽는 방법에는 한계가 있다.", answer: "O", options: ["O", "X"],
+                explanation: "모든 측정 도구는 제작상의 한계나 눈금의 정밀도 등으로 인해 측정값에 불확실성이 포함될 수밖에 없습니다. 또한, 측정값을 읽는 사람의 숙련도나 방법에 따라서도 오차가 발생할 수 있습니다."
+            },
+            {
+                id: 77, type: 'ox', text: "77. 측정에는 반올림과 같은 어림이 동반된다.", answer: "O", options: ["O", "X"],
+                explanation: "측정값은 유효숫자를 고려하여 기록해야 하며, 이 과정에서 측정 도구의 최소 눈금보다 작은 값을 읽거나 계산 결과를 정리할 때 반올림과 같은 어림 처리(근사값 처리)가 이루어지기도 합니다."
+            },
+            {
+                id: 78, type: 'fill-in', text: "78. (   )은 정확하고 일관성 있는 측정을 위해 만든 과학적 기준이다.", answer: "측정표준", options: ["측정표준", "단위체계", "실험설계", "과학법칙"],
+                explanation: "측정표준은 측정의 정확성과 통일성을 확보하기 위해 국제적으로 또는 국가적으로 정한 기준을 말합니다. 여기에는 단위의 정의, 표준 물질, 측정 방법 등이 포함됩니다."
+            },
+            {
+                id: 79, type: 'ox', text: "79. 기본량의 기본 단위를 쓰는 것도 측정표준이다.", answer: "O", options: ["O", "X"],
+                explanation: "측정표준에는 각 기본량에 대한 SI 기본 단위의 정의가 포함됩니다. 예를 들어, 1미터(m)의 정의 자체가 측정표준의 일부입니다."
+            },
+            {
+                id: 80, type: 'fill-in', text: "80. (   )은 측정에 있어서 기준이 되는 기본 단위에 대한 정의를 뜻한다.", answer: "측정표준", options: ["측정표준", "물리상수", "자연법칙", "과학원리"],
+                explanation: "측정표준은 측정의 기준이 되는 기본 단위(예: 미터, 킬로그램, 초 등)가 무엇을 의미하는지에 대한 명확한 정의를 포함하며, 이를 통해 모든 측정이 일관되고 비교 가능하게 됩니다."
+            },
+            {
+                id: 81, type: 'ox', text: "81. 서로 다른 단위를 쓰는 것은 측정 표준이다.", answer: "X", options: ["O", "X"],
+                explanation: "측정표준은 오히려 단위를 통일하고 일관성 있게 사용하기 위한 기준입니다. 서로 다른 단위를 혼용하는 것은 측정의 혼란을 야기하므로 측정표준의 목적과 반대됩니다."
+            },
+            {
+                id: 82, type: 'fill-in', text: "82. (   )란 1m에 해당하는 길이를 금속으로 만든 기구이다.", answer: "미터원기", options: ["미터원기", "킬로그램원기", "표준자", "측정기"],
+                explanation: "미터원기는 과거에 길이의 표준으로 사용되었던, 백금-이리듐 합금으로 만들어진 1미터 길이의 막대입니다. 현재는 빛의 속력을 기준으로 미터가 정의됩니다."
+            },
+            {
+                id: 83, type: 'fill-in', text: "83. (   )이란 길이, 질량, 부피 등의 양을 나타내는 단위와 관련된 체계이다.", answer: "도량형", options: ["도량형", "측정학", "단위계", "규격"],
+                explanation: "도량형은 길이, 부피, 무게(질량) 등을 재는 방법이나 이에 사용되는 단위 및 기구를 통틀어 이르는 말입니다. 역사적으로 각 문화권마다 다양한 도량형이 존재했습니다."
+            },
+            {
+                id: 84, type: 'ox', text: "84. 현재 길이의 측정 표준은 미터원기이다.", answer: "X", options: ["O", "X"],
+                explanation: "현재 길이(미터)의 측정 표준은 미터원기가 아니라, 빛이 진공에서 특정 시간(1/299,792,458초) 동안 진행한 거리로 정의됩니다. 이는 더 정확하고 변하지 않는 자연 상수를 기반으로 한 정의입니다."
+            },
+            {
+                id: 85, type: 'fill-in', text: "85. 현재 길이의 측정 표준은 (   )을 이용한다.", answer: "빛", options: ["빛", "소리", "원자", "지구"],
+                explanation: "현재 1미터는 빛이 진공 중에서 1/299,792,458초 동안 진행한 경로의 길이로 정의됩니다. 즉, 빛의 속력이라는 자연 상수를 기준으로 길이를 정의합니다."
+            },
+            {
+                id: 86, type: 'ox', text: "86. 측정 표준은 앞으로도 변함 없이 동일할 것이다.", answer: "X", options: ["O", "X"],
+                explanation: "과학 기술이 발전함에 따라 더 정확하고 안정적인 기준이 발견되면 측정 표준도 개정될 수 있습니다. 실제로 미터, 킬로그램 등의 정의는 역사적으로 여러 번 바뀌어 왔습니다."
+            },
+            {
+                id: 87, type: 'ox', text: "87. 기본 단위에 대한 정의를 측정 표준이라 한다.", answer: "O", options: ["O", "X"],
+                explanation: "측정표준의 핵심 요소 중 하나는 각 SI 기본 단위(미터, 킬로그램, 초 등)가 무엇을 의미하는지에 대한 명확하고 과학적인 정의입니다."
+            },
+            {
+                id: 88, type: 'fill-in', text: "88. 혈당량의 측정 표준은 (   )을 단위로 측정한다.", answer: "mg/dL", options: ["mg/dL", "mmol/L", "g/L", "%"],
+                explanation: "혈당량은 혈액 속 포도당의 농도를 의미하며, 일반적으로 mg/dL(밀리그램 퍼 데시리터) 또는 mmol/L(밀리몰 퍼 리터) 단위를 사용하여 측정하고 표시합니다. 우리나라에서는 mg/dL을 주로 사용합니다."
+            },
+            {
+                id: 89, type: 'fill-in', text: "89. 미세먼지 농도의 측정 표준은 (   )을 단위로 측정한다.", answer: "μg/m³", options: ["μg/m³", "mg/m³", "ppm", "ppb"],
+                explanation: "미세먼지(PM10)나 초미세먼지(PM2.5)의 농도는 공기 1세제곱미터(m<sup>3</sup>)당 들어있는 먼지의 질량을 마이크로그램(μg)으로 나타낸 μg/m<sup>3</sup> 단위를 표준으로 사용합니다."
+            },
+            {
+                id: 90, type: 'ox', text: "90. 우리나라에서 기온의 측정 표준은 K을 단위로 한다.", answer: "X", options: ["O", "X"],
+                explanation: "국제단위계(SI)에서 온도의 기본 단위는 켈빈(K)이지만, 우리나라 일상생활이나 기상 예보 등에서는 섭씨온도(℃)를 표준처럼 사용합니다. 과학 분야에서는 K을 사용합니다."
+            },
+            {
+                id: 91, type: 'ox', text: "91. 기본량 중 온도의 기본 단위는 K이다.", answer: "O", options: ["O", "X"],
+                explanation: "국제단위계(SI)에서 정의하는 7가지 기본량 중 열역학적 온도의 기본 단위는 켈빈(K)입니다."
+            },
+            {
+                id: 92, type: 'ox', text: "92. 우리나라에서 자동차 속도의 측정 표준은 m/s 이다.", answer: "X", options: ["O", "X"],
+                explanation: "국제단위계(SI)에서 속도의 기본 단위는 m/s(미터 매 초)이지만, 우리나라에서 자동차의 속도는 일상적으로 km/h(킬로미터 매 시) 단위를 사용합니다."
+            },
+            {
+                id: 93, type: 'ox', text: "93. 기본량 중 속도의 기본 단위는 m/s 이다.", answer: "O", options: ["O", "X"],
+                explanation: "속력(또는 속도)은 유도량이지만, 국제단위계(SI)에서 속력의 단위는 m/s(미터 매 초)입니다. 이 단위는 기본 단위인 미터(m)와 초(s)로 구성됩니다."
+            },
+            {
+                id: 94, type: 'ox', text: "94. L는 부피의 기본 단위이다.", answer: "X", options: ["O", "X"],
+                explanation: "리터(L)는 부피의 단위로 널리 사용되지만, 국제단위계(SI)에서 부피의 기본 단위는 세제곱미터(m<sup>3</sup>)입니다. 1L는 0.001m<sup>3</sup> 또는 1dm<sup>3</sup>와 같습니다."
+            },
+            {
+                id: 95, type: 'ox', text: "95. 측정 단위는 측정 표준에 포함된다.", answer: "O", options: ["O", "X"],
+                explanation: "측정표준은 정확하고 일관된 측정을 위한 기준으로, 여기에는 사용할 단위의 정의(예: 1미터는 무엇인가)가 명확하게 포함됩니다."
+            },
+            {
+                id: 96, type: 'ox', text: "96. 측정 방법은 측정 표준에 포함된다.", answer: "O", options: ["O", "X"],
+                explanation: "측정표준에는 특정 물리량을 어떻게 측정해야 하는지에 대한 절차나 방법론도 포함될 수 있습니다. 이는 측정 결과의 신뢰성과 비교 가능성을 높이기 위함입니다."
+            },
+            {
+                id: 97, type: 'ox', text: "97. 측정 도구는 측정 표준에 포함된다.", answer: "O", options: ["O", "X"],
+                explanation: "측정표준은 때때로 특정 측정 도구의 규격이나 교정 방법을 명시하거나, 표준물질(예: 과거의 킬로그램원기) 자체를 기준으로 삼기도 합니다. 이는 도구로 인한 오차를 줄이고 일관성을 유지하기 위함입니다."
+            },
+            {
+                id: 98, type: 'ox', text: "98. 표준 물질은 측정 표준에 포함된다.", answer: "O", options: ["O", "X"],
+                explanation: "표준 물질은 조성이나 물리적 특성이 정확하게 알려진 물질로, 측정 기기를 교정하거나 측정 방법의 정확성을 검증하는 데 사용됩니다. 이러한 표준 물질의 규격과 사용법도 측정표준의 중요한 부분입니다."
+            },
+            {
+                id: 99, type: 'fill-in', text: "99. 우리나라는 동경 135°를 기준으로 하는 (   )를 따른다.", answer: "표준시", options: ["표준시", "지방시", "세계시", "일광절약시간"],
+                explanation: "우리나라의 표준시는 동경 135° 자오선을 기준으로 하며, 이는 협정 세계시(UTC)보다 9시간 빠릅니다 (UTC+9)."
+            },
+            {
+                id: 100, type: 'ox', text: "100. 원자의 크기 측정이나 우주 나이의 측정에서도 측정 표준이 활용된다.", answer: "O", options: ["O", "X"],
+                explanation: "매우 작은 규모(원자 크기)나 매우 큰 규모(우주 나이, 천체까지의 거리)를 측정할 때도 각각의 영역에 맞는 정밀한 측정 방법과 단위, 그리고 이를 뒷받침하는 측정표준이 활용됩니다."
+            },
+            {
+                id: 101, type: 'fill-in', text: "101. 빛의 세기, 소리, 온도, 지진파 등을 (   )라한다.", answer: "신호", options: ["신호", "정보", "데이터", "에너지"],
+                explanation: "신호는 자연 현상이나 인공적인 장치에서 발생하는 변화나 현상이 시간이나 공간에 따라 변하는 형태로, 우리에게 어떤 정보를 전달할 수 있는 물리적인 표현입니다. 빛, 소리, 온도, 전파, 지진파 등이 신호의 예입니다."
+            },
+            {
+                id: 102, type: 'fill-in', text: "102. (   )란 자연에서 일어나는 다양한 변화가 우리에게 전달 되는 것이다.", answer: "신호", options: ["신호", "정보", "자극", "현상"],
+                explanation: "신호는 감각 기관이나 측정 장치를 통해 감지될 수 있는 형태로 에너지가 전달되거나 상태가 변화하는 것을 의미합니다. 이러한 신호를 통해 우리는 주변 환경에 대한 정보를 얻습니다."
+            },
+            {
+                id: 103, type: 'fill-in', text: "103. (   )란 신호를 측정하고 분석하여 유용한 형태로 만든 것이다.", answer: "정보", options: ["정보", "자료", "지식", "신호"],
+                explanation: "정보는 수집된 신호나 자료(데이터)를 특정 목적에 맞게 해석하고 가공하여 의미 있고 유용한 형태로 만든 결과물입니다."
+            },
+            {
+                id: 104, type: 'fill-in', text: "104. (   )이란 불연속적인 값을 갖는 형태이다.", answer: "디지털", options: ["디지털", "아날로그", "연속", "이산"],
+                explanation: "디지털은 데이터를 0과 1처럼 명확하게 구분되는 값(이산적인 값)으로 표현하는 방식입니다. 예를 들어 디지털시계는 시간이 1초, 2초 단위로 끊어져서 표시됩니다."
+            },
+            {
+                id: 105, type: 'fill-in', text: "105. (   )란 연속적인 값을 갖는 신호의 형태이다.", answer: "아날로그", options: ["아날로그", "디지털", "불연속", "부호"],
+                explanation: "아날로그는 온도, 소리의 크기, 빛의 밝기처럼 연속적으로 변하는 값을 그대로 표현하는 방식입니다. 예를 들어 수은 온도계의 눈금이나 LP판의 소리골은 아날로그 신호입니다."
+            },
+            {
+                id: 106, type: 'fill-in', text: "106. [복자] 디지털 신호란 0과 1의 (   )로 표시되는 신호이다.", answer: "이진수", options: ["이진수", "십진수", "문자", "기호"],
+                explanation: "디지털 신호는 모든 정보를 두 가지 상태(보통 0과 1)의 조합인 이진수(binary digit, bit)로 표현합니다. 이는 컴퓨터가 정보를 처리하고 저장하는 기본적인 방식입니다."
+            },
+            {
+                id: 107, type: 'fill-in', text: "107. 신호를 저장하거나 재생, 전송하는데 편리한 것은 (   )신호", answer: "디지털", options: ["디지털", "아날로그", "광학", "음성"],
+                explanation: "디지털 신호는 잡음에 강하고, 복제 시 원본 손실이 거의 없으며, 압축 및 편집이 용이하여 저장, 재생, 전송에 매우 유리합니다."
+            },
+            {
+                id: 108, type: 'fill-in', text: "108. 저장에 필요한 용량이 적고, 복사와 편집이 자유로운 것은 (   ) 신호", answer: "디지털", options: ["디지털", "아날로그", "원본", "압축"],
+                explanation: "디지털 신호는 압축 기술을 통해 저장 용량을 줄일 수 있고, 데이터 손실 없이 쉽게 복사하거나 다양한 소프트웨어를 이용해 편집할 수 있다는 장점이 있습니다."
+            },
+            {
+                id: 109, type: 'fill-in', text: "109. (   )는 자연계의 아날로그 신호를 전기 신호인 디지털 신호로 바꾸는 장치", answer: "센서", options: ["센서", "변환기", "증폭기", "필터"],
+                explanation: "센서는 온도, 빛, 소리, 압력 등 자연계의 다양한 아날로그 물리량을 감지하여 전기적인 신호(주로 아날로그 전압 또는 전류)로 변환하는 장치입니다. 이 전기 신호는 다시 ADC(아날로그-디지털 변환기)를 통해 디지털 신호로 바뀝니다. 문제에서는 포괄적으로 센서로 표현한 듯합니다."
+            },
+            {
+                id: 110, type: 'ox', text: "110. 센서를 이용하면 원래 가지고 있던 정보가 손실 없이 변환된다.", answer: "X", options: ["O", "X"],
+                explanation: "센서가 아날로그 신호를 전기 신호로 변환하거나, 이 신호를 다시 디지털 신호로 변환하는 과정(양자화, 샘플링)에서 어느 정도의 정보 손실이나 오차가 발생할 수 있습니다. 완벽하게 손실 없이 변환하는 것은 현실적으로 어렵습니다."
+            },
+            {
+                id: 111, type: 'fill-in', text: "111. 지진파는 (   )의 형태로 전달된다.", answer: "파동", options: ["파동", "입자", "전류", "열"],
+                explanation: "지진파는 지진 발생 시 지구 내부의 에너지가 매질(땅, 암석 등)을 통해 사방으로 전파되는 진동, 즉 파동의 한 종류입니다."
+            },
+            {
+                id: 112, type: 'fill-in', text: "112. [복자] 광센서에서 감지하는 신호는 (   )이다.", answer: "적외선", options: ["적외선", "자외선", "가시광선", "빛"],
+                explanation: "광센서는 빛을 감지하는 센서로, 종류에 따라 가시광선, 적외선, 자외선 등 특정 파장대의 빛 또는 넓은 범위의 빛을 감지할 수 있습니다. 문제의 빈칸은 '빛'이 가장 포괄적이나, PDF의 답이 '적외선'이므로 이를 따릅니다."
+            },
+            {
+                id: 113, type: 'fill-in', text: "113. [복자] 화학센서에서 감지하는 신호는 (   )이다.", answer: "가스", options: ["가스", "액체", "고체", "냄새"],
+                explanation: "화학 센서는 특정 화학 물질의 존재나 농도를 감지하는 센서입니다. 예를 들어 가스 누출 감지기, 음주 측정기 등이 화학 센서를 이용합니다. 문제의 빈칸은 '가스'를 예로 들고 있습니다."
+            },
+            {
+                id: 114, type: 'fill-in', text: "114. [복자] 압력센서에서 감지하는 신호는 (   )이다.", answer: "힘", options: ["힘", "무게", "변형", "압력"],
+                explanation: "압력 센서는 특정 면적에 작용하는 힘, 즉 압력을 감지하여 전기적 신호로 변환하는 장치입니다. 터치스크린, 혈압계, 타이어 공기압 센서 등에 사용됩니다. '힘' 또는 '압력' 모두 가능합니다."
+            },
+            {
+                id: 115, type: 'fill-in', text: "115. 열화상 카메라로 감지하는 신호는 (   )이다.", answer: "온도", options: ["온도", "열에너지", "적외선", "색깔"],
+                explanation: "열화상 카메라는 물체가 방출하는 적외선 복사 에너지를 감지하여, 이를 온도 정보로 변환하고 시각적인 이미지로 보여주는 장치입니다. 즉, 표면의 온도 분포를 감지합니다."
+            },
+            {
+                id: 116, type: 'fill-in', text: "116. (   )서비스를 통해 여러 사람과 디지털 정보를 공유할 수 있다.", answer: "사회관계망", options: ["사회관계망", "클라우드", "이메일", "인터넷"],
+                explanation: "사회관계망 서비스(SNS, Social Networking Service)는 온라인상에서 사용자들이 서로 관계를 맺고 다양한 디지털 정보(글, 사진, 영상 등)를 생성하고 공유할 수 있도록 하는 플랫폼입니다."
+            },
+            {
+                id: 117, type: 'fill-in', text: "117. 고대 이집트에서 (   )이라는 팔꿈치부터 가운뎃 손가락까지의 길이를 측정표준으로 하여 정교한 피라미드를 건설할 수 있었다.", answer: "큐빗", options: ["큐빗", "피트", "야드", "뼘"],
+                explanation: "큐빗(cubit)은 고대 이집트를 비롯한 여러 문명에서 사용된 길이의 단위로, 주로 팔꿈치에서 가운데 손가락 끝까지의 길이를 기준으로 했습니다. 이를 측정표준으로 삼아 피라미드와 같은 거대한 건축물을 정교하게 건설할 수 있었습니다."
+            }
+        ];
+
+        const quizElement = document.getElementById('quiz');
+        const paginationControlsElement = document.getElementById('pagination-controls');
+        const submitPageButton = document.getElementById('submit-page-btn');
+        const scoreSectionElement = document.getElementById('score-section');
+        const currentPageScoreTextElement = document.getElementById('current-page-score-text');
+        const totalScoreTextElement = document.getElementById('total-score-text');
+        const pageInfoElement = document.getElementById('page-info');
+
+        const questionsPerPage = 20;
+        let currentPage = 0;
+        let pageScores = []; 
+        let pageAttempted = []; 
+
+        function initializeQuizData() {
+            questions.forEach(q => {
+                q.userAnswer = null;
+                q.isCorrect = null;
+                q.attemptedThisSession = false; // 현재 세션에서 시도했는지 여부
+            });
+            const numPages = Math.ceil(questions.length / questionsPerPage);
+            pageAttempted = new Array(numPages).fill(false);
+            pageScores = new Array(numPages).fill(0);
+        }
+
+
+        function renderQuestionsForPage(page) {
+            quizElement.innerHTML = ''; 
+            currentPage = page;
+
+            const start = page * questionsPerPage;
+            const end = Math.min(start + questionsPerPage, questions.length);
+            const questionsOnPage = questions.slice(start, end);
+
+            pageInfoElement.textContent = `총 ${questions.length}문제 중 ${start + 1} - ${end}번 문제`;
+
+            questionsOnPage.forEach((q, indexOnPage) => {
+                const questionCard = document.createElement('div');
+                questionCard.classList.add('question-card');
+                questionCard.id = `question-${q.id}`;
+
+                const questionText = document.createElement('p');
+                questionText.classList.add('question-text');
+                questionText.innerHTML = q.text.replace(/\(\s*(?:   )?\s*\)/g, '( <span class="blank-emphasis">빈칸</span> )');
+                questionCard.appendChild(questionText);
+
+                const optionsContainer = document.createElement('div');
+                optionsContainer.classList.add('options');
+
+                q.options.forEach(option => {
+                    const optionId = `q${q.id}-option-${option.replace(/[^a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣]/g, '')}`;
+                    
+                    const radioInput = document.createElement('input');
+                    radioInput.type = 'radio';
+                    radioInput.id = optionId;
+                    radioInput.name = `question-${q.id}`; 
+                    radioInput.value = option;
+                    radioInput.classList.add('option-input', 'hidden');
+                    if (q.userAnswer === option) radioInput.checked = true; 
+                    if (pageAttempted[currentPage]) radioInput.disabled = true;
+
+                    const optionLabel = document.createElement('label');
+                    optionLabel.htmlFor = optionId;
+                    optionLabel.textContent = option;
+                    optionLabel.classList.add('option-label');
+                    if (pageAttempted[currentPage]) optionLabel.classList.add('opacity-70', 'cursor-not-allowed');
+
+                    optionsContainer.appendChild(radioInput);
+                    optionsContainer.appendChild(optionLabel);
+                });
+                questionCard.appendChild(optionsContainer);
+
+                const feedbackElement = document.createElement('div');
+                feedbackElement.classList.add('feedback');
+                feedbackElement.style.display = 'none'; 
+                questionCard.appendChild(feedbackElement);
+                
+                if (pageAttempted[currentPage] && q.attemptedThisSession) {
+                    showFeedbackForQuestion(q, questionCard);
+                }
+                quizElement.appendChild(questionCard);
+            });
+
+            renderPaginationControls();
+            submitPageButton.disabled = pageAttempted[currentPage];
+            if (pageAttempted[currentPage]) {
+                submitPageButton.textContent = '채점 완료';
+                scoreSectionElement.style.display = 'block'; 
+                updateScoreDisplay(); 
+            } else {
+                submitPageButton.textContent = '이번 페이지 채점하기';
+                if (questionsOnPage.length > 0) { // 현재 페이지에 문제가 있을 때만 점수 섹션 숨김
+                     scoreSectionElement.style.display = 'none';
+                } else { // 문제가 없는 페이지 (예: 데이터 로딩 실패 등)
+                     scoreSectionElement.style.display = 'block';
+                     currentPageScoreTextElement.textContent = '이번 페이지에 문제가 없습니다.';
+                     totalScoreTextElement.textContent = '';
+                }
+            }
+        }
+        
+        function showFeedbackForQuestion(question, questionCard) {
+            const feedbackElement = questionCard.querySelector('.feedback');
+            if (!feedbackElement) return;
+
+            feedbackElement.innerHTML = ''; 
+
+            if (question.isCorrect) {
+                feedbackElement.innerHTML = '<strong class="font-semibold">정답입니다!</strong> 🎉';
+                feedbackElement.className = 'feedback correct';
+            } else {
+                feedbackElement.innerHTML = `<strong class="font-semibold">오답입니다.</strong> 정답은 "<span class="font-bold text-red-700">${question.answer}</span>"입니다.`;
+                feedbackElement.className = 'feedback incorrect';
+            }
+
+            const explanationElement = document.createElement('p');
+            explanationElement.classList.add('explanation');
+            explanationElement.innerHTML = `<strong class="font-semibold">해설:</strong> ${question.explanation}`;
+            feedbackElement.appendChild(explanationElement);
+            feedbackElement.style.display = 'block';
+        }
+
+
+        function renderPaginationControls() {
+            paginationControlsElement.innerHTML = '';
+            const numPages = Math.ceil(questions.length / questionsPerPage);
+
+            const prevButton = document.createElement('button');
+            prevButton.textContent = '이전';
+            prevButton.disabled = currentPage === 0;
+            prevButton.onclick = () => renderQuestionsForPage(currentPage - 1);
+            paginationControlsElement.appendChild(prevButton);
+
+            for (let i = 0; i < numPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i + 1;
+                pageButton.classList.add('page-number');
+                if (i === currentPage) {
+                    pageButton.classList.add('current');
+                }
+                pageButton.onclick = () => renderQuestionsForPage(i);
+                paginationControlsElement.appendChild(pageButton);
+            }
+
+            const nextButton = document.createElement('button');
+            nextButton.textContent = '다음';
+            nextButton.disabled = currentPage === numPages - 1;
+            nextButton.onclick = () => renderQuestionsForPage(currentPage + 1);
+            paginationControlsElement.appendChild(nextButton);
+        }
+
+        submitPageButton.addEventListener('click', () => {
+            if (pageAttempted[currentPage]) return; 
+
+            let scoreForThisPage = 0;
+            
+            const start = currentPage * questionsPerPage;
+            const end = Math.min(start + questionsPerPage, questions.length);
+            const questionsOnPage = questions.slice(start, end);
+
+            questionsOnPage.forEach((q, indexOnPage) => {
+                const questionCard = quizElement.children[indexOnPage]; 
+                const selectedOption = questionCard.querySelector(`input[name="question-${q.id}"]:checked`);
+                
+                q.attemptedThisSession = true; // 현재 세션에서 시도됨
+
+                if (selectedOption) {
+                    q.userAnswer = selectedOption.value;
+                    q.isCorrect = (q.userAnswer === q.answer);
+                    if (q.isCorrect) {
+                        scoreForThisPage++; 
+                    }
+                    showFeedbackForQuestion(q, questionCard);
+
+                    const radioInputs = questionCard.querySelectorAll('input[type="radio"]');
+                    radioInputs.forEach(input => input.disabled = true);
+                } else {
+                    const feedbackElement = questionCard.querySelector('.feedback');
+                    feedbackElement.textContent = '답을 선택하지 않았습니다.';
+                    feedbackElement.className = 'feedback incorrect';
+                    feedbackElement.style.display = 'block';
+                    q.isCorrect = false; // 선택 안함도 오답 처리
+                }
+            });
+            
+            pageScores[currentPage] = scoreForThisPage;
+            pageAttempted[currentPage] = true;
+            submitPageButton.disabled = true;
+            submitPageButton.textContent = '채점 완료';
+            
+            scoreSectionElement.style.display = 'block';
+            updateScoreDisplay();
+        });
+
+        function updateScoreDisplay() {
+            const questionsOnThisPageCount = Math.min(questionsPerPage, questions.length - currentPage * questionsPerPage);
+            currentPageScoreTextElement.textContent = `이번 페이지 점수: ${pageScores[currentPage]} / ${questionsOnThisPageCount}`;
+            
+            let currentTotalScore = 0;
+            let currentTotalAttemptedQuestions = 0;
+            for(let i=0; i < pageAttempted.length; i++){
+                if(pageAttempted[i]){
+                    const start = i * questionsPerPage;
+                    const end = Math.min(start + questionsPerPage, questions.length);
+                    currentTotalAttemptedQuestions += (end-start);
+                    currentTotalScore += pageScores[i];
+                }
+            }
+
+            if (currentTotalAttemptedQuestions > 0) {
+                 totalScoreTextElement.textContent = `총 누적 점수: ${currentTotalScore} / ${currentTotalAttemptedQuestions}`;
+            } else {
+                 totalScoreTextElement.textContent = `총 누적 점수: 0 / 0`;
+            }
+        }
+        
+        // Initialize
+        initializeQuizData();
+        renderQuestionsForPage(0);
+
+    </script>
+</body>
+</html>
+

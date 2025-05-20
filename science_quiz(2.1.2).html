@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2.1.2 물질과 규칙성 - 별의 진화와 원소의 생성 (1-34번)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .question-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .question-text .blank-emphasis { 
+            font-weight: bold;
+            color: #3b82f6; 
+        }
+        .option-label {
+            display: block;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            background-color: #f7fafc;
+        }
+        .option-label:hover {
+            background-color: #e2e8f0;
+        }
+        .option-input:checked + .option-label {
+            background-color: #4299e1;
+            color: white;
+            border-color: #2b6cb0;
+        }
+        .feedback {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+        .feedback.correct {
+            background-color: #c6f6d5;
+            color: #2f855a;
+            border: 1px solid #9ae6b4;
+        }
+        .feedback.incorrect {
+            background-color: #fed7d7;
+            color: #c53030;
+            border: 1px solid #fbb6ce;
+        }
+        .explanation {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+        .action-button {
+            background-color: #4a5568;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: none;
+            margin-top: 1rem;
+            margin-right: 0.5rem;
+        }
+        .action-button:hover:not(:disabled) {
+            background-color: #2d3748;
+        }
+        .action-button:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+        .pagination-controls {
+            display: flex; 
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        .pagination-controls button, .pagination-controls span {
+            margin: 0 0.25rem;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        .pagination-controls button:disabled {
+            background-color: #e2e8f0;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .pagination-controls .page-number.current {
+            background-color: #4299e1;
+            color: white;
+            border-color: #2b6cb0;
+            font-weight: bold;
+        }
+        .score-section {
+            margin-top: 1.5rem;
+            padding: 1.5rem; 
+            background-color: #e9f5ff;
+            border-radius: 8px;
+            text-align: left;
+        }
+        .score-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+        }
+        .quiz-title-in-score {
+            font-size: 1.1rem; 
+            font-weight: bold;
+            color: #1e40af; 
+            margin-bottom: 0.75rem; 
+        }
+        .motivational-quote { 
+            font-size: 1rem;
+            font-style: italic;
+            color: #374151; 
+            margin-top: 1.5rem; 
+            padding-top: 1rem;
+            border-top: 1px dashed #cbd5e0; 
+            text-align: center;
+        }
+        h1 { 
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a202c;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .page-info {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        /* 팝업 스타일 */
+        .popup-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); display: flex;
+            justify-content: center; align-items: center; z-index: 1000; 
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .popup-overlay.show { opacity: 1; visibility: visible; }
+        .popup-content {
+            background-color: white; padding: 2.5rem; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); text-align: center;
+            max-width: 420px; width: 90%;
+        }
+        .popup-content h2 {
+            font-size: 1.75rem; font-weight: 700; color: #1a202c; margin-bottom: 1rem;
+        }
+        .popup-content p.welcome-message {
+            font-size: 1rem; color: #4a5568; margin-bottom: 1.5rem; line-height: 1.6;
+        }
+        .popup-password-input {
+            width: 100%; padding: 0.75rem; margin-bottom: 1rem;
+            border: 1px solid #cbd5e0; border-radius: 6px; font-size: 1rem;
+            box-sizing: border-box; 
+        }
+        .popup-confirm-btn {
+            background-color: #3b82f6; color: white; padding: 0.75rem 1.5rem;
+            border-radius: 8px; font-weight: 500; cursor: pointer;
+            transition: background-color 0.2s; border: none; width: 100%;
+            font-size: 1rem;
+        }
+        .popup-confirm-btn:hover { background-color: #2563eb; }
+        .popup-error-message {
+            color: #ef4444; font-size: 0.875rem; margin-top: 0.75rem;
+            min-height: 1.25rem; 
+        }
+    </style>
+</head>
+<body>
+    <div id="welcome-popup" class="popup-overlay">
+        <div class="popup-content">
+            <h2>Appia 과학학원</h2>
+            <p class="welcome-message">유선종 선생님의 학습 자료입니다.<br>비밀번호를 입력해주세요.</p>
+            <input type="password" id="popup-password" class="popup-password-input" placeholder="비밀번호">
+            <button id="popup-confirm" class="popup-confirm-btn">확인</button>
+            <p id="popup-error" class="popup-error-message"></p>
+        </div>
+    </div>
+    <div class="quiz-container">
+        <h1>2.1.2 물질과 규칙성 - 별의 진화와 원소의 생성 (54p ~ 57p)</h1>
+        <div class="page-info" id="page-info"></div>
+        <div id="quiz">
+            </div>
+        <div class="pagination-controls" id="pagination-controls">
+            </div>
+        <button id="submit-page-btn" class="action-button w-full sm:w-auto mx-auto block">이번 페이지 채점하기</button>
+        <div class="score-section" id="score-section" style="display: none;">
+            <p class="score-text quiz-title-in-score" id="quiz-main-title-in-score"></p> 
+            <p class="score-text" id="current-page-score-text"></p>
+            <p class="score-text" id="total-score-text"></p>
+            <p class="motivational-quote" id="motivational-quote" style="display: none;"></p> 
+        </div>
+    </div>
+
+    <script>
+        // 문제 데이터 (PDF "2.1.2 물질과 규칙성-별의 진화와 원소의 생성.pdf" 기준)
+        const questions = [
+            {
+                id: 1, type: 'fill-in', text: "1. (   )이란 우주 공간에서 (   ), (   ), 먼지 등으로 이루어진 것",
+                answer: "성간물질;수소;헬륨", options: ["성운;산소;질소", "성간물질;수소;헬륨", "은하;탄소;철", "블랙홀;암흑물질;암흑에너지"],
+                explanation: "성간물질은 별과 별 사이의 우주 공간에 존재하는 가스(주로 수소와 헬륨)와 티끌(먼지) 등의 물질을 말합니다."
+            },
+            {
+                id: 2, type: 'fill-in', text: "2. (   )이란 성간 물질이 구름처럼 모인 것",
+                answer: "성운", options: ["성단", "은하단", "성운", "퀘이사"],
+                explanation: "성운은 성간물질이 중력 등의 영향으로 비교적 밀도가 높게 구름처럼 모여 있는 영역을 말하며, 새로운 별이 탄생하는 장소가 되기도 합니다."
+            },
+            {
+                id: 3, type: 'fill-in', text: "3. (   )에 의해 수축하면 온도가 점점 (   )",
+                answer: "중력;높아진다", options: ["자기력;낮아진다", "원심력;일정하다", "중력;높아진다", "압력;변하지 않는다"],
+                explanation: "성운과 같이 가스와 먼지로 이루어진 구름이 자체 중력으로 수축하면 위치 에너지가 열에너지로 전환되어 중심부의 온도와 압력이 점점 높아집니다."
+            },
+            {
+                id: 4, type: 'fill-in', text: "4. 수소 핵융합 반응은 별의 중심부 온도가 (   ) 이상이 되면 시작된다.",
+                answer: "1000만K", options: ["1억K", "6000K", "1000만K", "100만K"],
+                explanation: "별의 중심부 온도가 약 1000만 켈빈(K) 이상으로 높아지면, 수소 원자핵들이 높은 운동 에너지로 서로의 전기적 반발력을 이겨내고 충돌하여 헬륨 원자핵으로 변하는 수소 핵융합 반응이 시작될 수 있습니다."
+            },
+            {
+                id: 5, type: 'fill-in', text: "5. 수소 핵융합 반응은 수소 원자핵 (   )개가 헬륨 원자핵 (   )개가 되는 과정이다.",
+                answer: "4;1", options: ["2;1", "4;1", "1;4", "3;1"],
+                explanation: "주계열성의 중심부에서 일어나는 주된 수소 핵융합 반응(양성자-양성자 연쇄 반응)은 결과적으로 4개의 수소 원자핵(양성자)이 1개의 헬륨-4 원자핵으로 변환되는 과정입니다."
+            },
+            {
+                id: 6, type: 'fill-in', text: "6. 수소 핵융합 반응 결과 (   )이 발생해 별의 크기가 일정하다.",
+                answer: "내부압력", options: ["중력수축", "자기장", "내부압력", "원심력"],
+                explanation: "별의 중심부에서 일어나는 핵융합 반응은 막대한 에너지를 방출하여 바깥쪽으로 밀어내는 내부 압력(주로 복사압과 가스압)을 생성합니다. 이 내부 압력이 별 자체의 질량 때문에 안쪽으로 작용하는 중력과 평형을 이루면 별의 크기가 일정하게 유지됩니다."
+            },
+            {
+                id: 7, type: 'fill-in', text: "7. 별의 중력과 내부 압력이 같은 상태를 (   ) 상태라 한다.",
+                answer: "평형", options: ["수축", "팽창", "불안정", "평형"],
+                explanation: "주계열성과 같이 안정된 별은 내부에서 바깥쪽으로 작용하는 압력과 안쪽으로 작용하는 중력이 서로 균형을 이루는 정역학적 평형 상태에 있습니다."
+            },
+            {
+                id: 8, type: 'fill-in', text: "8. 별의 중력이 내부 압력보다 크면 별의 크기는 (   )한다.",
+                answer: "감소", options: ["증가", "감소", "일정", "폭발"],
+                explanation: "만약 별의 중력이 내부에서 바깥쪽으로 미는 압력보다 커지면, 별은 중력의 영향으로 수축하게 되어 크기가 감소합니다."
+            },
+            {
+                id: 9, type: 'fill-in', text: "9. 별의 중력이 내부 압력보다 작으면 별의 크기는 (   )한다.",
+                answer: "증가", options: ["감소", "일정", "증가", "소멸"],
+                explanation: "반대로 별의 내부 압력이 중력보다 커지면, 별은 바깥쪽으로 팽창하게 되어 크기가 증가합니다."
+            },
+            {
+                id: 10, type: 'fill-in', text: "10. 성간 물질이 뭉쳐 성운이 되고 원시별이 되는 과정에서 밀도는 점점 (   )한다.",
+                answer: "증가", options: ["감소", "일정", "변동 없음", "증가"],
+                explanation: "성간물질이 중력에 의해 수축하여 성운을 이루고, 성운의 중심부가 더욱 수축하여 원시별이 되는 과정에서는 물질이 점점 더 좁은 공간에 모이므로 밀도는 계속 증가합니다."
+            },
+            {
+                id: 11, type: 'fill-in', text: "11. 헬륨 핵융합 반응은 중심부의 온도가 (   )K 이상이 되면 시작한다.",
+                answer: "1억", options: ["1000만", "5000만", "1억", "10억"],
+                explanation: "수소 핵융합이 끝나고 별의 중심부가 더욱 수축하여 온도가 약 1억 켈빈(K) 이상이 되면, 헬륨 원자핵들이 서로 충돌하여 탄소나 산소 원자핵을 만드는 헬륨 핵융합 반응이 시작될 수 있습니다."
+            },
+            {
+                id: 12, type: 'fill-in', text: "12. 별의 중심부에서 수소가 모두 헬륨으로 바뀌면 중심부는 (   ), 바깥층은 (   )한다.",
+                answer: "수축;팽창", options: ["팽창;수축", "안정;안정", "수축;팽창", "폭발;소멸"],
+                explanation: "별의 중심부에서 수소 핵융합이 끝나면 에너지 생성이 줄어들어 중력을 이기지 못하고 중심부는 수축합니다. 이 수축으로 인해 중심부 주변의 수소층 온도가 올라가 수소껍질연소가 격렬해지면서 별의 바깥층은 크게 팽창하여 적색 거성 단계로 진입합니다."
+            },
+            {
+                id: 13, type: 'ox', text: "13. 별의 중심부가 모두 헬륨으로 바뀌자마자 중심부에서 헬륨 핵융합 반응이 시작된다.",
+                answer: "X", options: ["O", "X"],
+                explanation: "중심부의 수소가 모두 헬륨으로 바뀐다고 해서 바로 헬륨 핵융합이 시작되는 것은 아닙니다. 중심부가 중력으로 더욱 수축하여 온도가 약 1억 K 이상으로 충분히 높아져야 헬륨 핵융합 반응이 점화될 수 있습니다."
+            },
+            {
+                id: 14, type: 'fill-in', text: "14. 질량이 태양과 비슷한 별은 (   ) 핵융합 반응까지 일어나고, (   )까지 생성된다.",
+                answer: "헬륨;탄소", options: ["수소;헬륨", "탄소;철", "헬륨;탄소", "규소;철"],
+                explanation: "질량이 태양 정도인 별은 중심부에서 수소 핵융합 후 헬륨 핵융합을 통해 탄소와 일부 산소까지 생성할 수 있습니다. 그 이상의 무거운 원소를 만들 만큼 중심부 온도가 높아지지는 못합니다."
+            },
+            {
+                id: 15, type: 'fill-in', text: "15. 질량이 태양보다 훨씬 큰 별은 (   )까지 생성된다.",
+                answer: "철", options: ["금", "우라늄", "탄소", "철"],
+                explanation: "질량이 태양보다 약 8배 이상으로 매우 큰 별은 중심부 온도가 매우 높게 올라갈 수 있어, 탄소, 산소, 네온, 마그네슘, 규소 등의 핵융합 반응을 거쳐 최종적으로 가장 안정한 원소인 철(Fe)까지 생성할 수 있습니다."
+            },
+            {
+                id: 16, type: 'ox', text: "16. 철보다 무거운 원소는 철의 핵융합 반응으로 생성된다.",
+                answer: "X", options: ["X", "O"],
+                explanation: "철은 핵자당 결합 에너지가 가장 큰 매우 안정한 원소이므로, 철보다 무거운 원소를 핵융합 반응으로 만들려면 에너지를 흡수해야 합니다. 따라서 별의 정상적인 핵융합 과정으로는 철보다 무거운 원소가 생성되지 않습니다."
+            },
+            {
+                id: 17, type: 'ox', text: "17. 철은 핵융합 반응을 할 수 있다.",
+                answer: "X", options: ["O", "X"],
+                explanation: "철은 가장 안정한 원자핵 중 하나로, 철보다 가벼운 원소들이 핵융합하여 철이 될 때는 에너지를 방출하지만, 철이 더 무거운 원소로 핵융합하려면 오히려 에너지를 흡수해야 합니다. 따라서 별의 중심부에서 철은 더 이상 핵융합을 통해 에너지를 생성하지 못합니다."
+            },
+            {
+                id: 18, type: 'fill-in', text: "18. 철보다 무거운 원소는 (   )을 통해 만들어 진다.",
+                answer: "초신성폭발", options: ["별의 핵융합", "빅뱅 핵합성", "초신성폭발", "행성상 성운"],
+                explanation: "철보다 무거운 원소들(금, 은, 우라늄 등)은 질량이 매우 큰 별이 마지막 단계에서 겪는 초신성 폭발 시 발생하는 막대한 에너지와 중성자 포획 과정을 통해 주로 생성됩니다."
+            },
+            {
+                id: 19, type: 'fill-in', text: "19. 별의 진화과정이 반복되면 우주 전체의 수소는 (   ) 한다.",
+                answer: "감소", options: ["증가", "일정", "감소", "순환"],
+                explanation: "별은 수소를 핵융합하여 헬륨이나 더 무거운 원소로 바꾸므로, 별의 생성과 진화 과정이 반복될수록 우주 전체의 수소량은 점차 감소하고 무거운 원소의 비율은 증가합니다."
+            },
+            {
+                id: 20, type: 'fill-in', text: "20. 별의 진화과정이 반복되면 우주 전체의 무거운 원소의 비율은 (   )한다.",
+                answer: "증가", options: ["감소", "일정", "사라짐", "증가"],
+                explanation: "별의 내부에서 핵융합 반응을 통해 수소와 헬륨보다 무거운 원소들이 생성되고, 이 원소들은 별의 마지막 단계(행성상 성운, 초신성 폭발 등)에서 우주 공간으로 방출됩니다. 따라서 별의 진화가 거듭될수록 우주에는 무거운 원소들이 점차 축적됩니다."
+            },
+            {
+                id: 21, type: 'fill-in', text: "21. 원시 태양은 약 (   )억년 전 형성되었다.",
+                answer: "50", options: ["46", "138", "50", "100"], // PDF는 50억년으로 표기 (태양계 형성 시점은 약 46억년 전)
+                explanation: "태양계는 약 46억 년 전에 형성되었으며, 원시 태양은 이보다 약간 앞선 시점, 대략 50억 년 전후에 성운이 수축하면서 형성되기 시작했을 것으로 추정됩니다. (일반적으로 태양계 나이를 46억년으로 많이 이야기합니다.)"
+            },
+            {
+                id: 22, type: 'ox', text: "22. 원시 행성은 원시 태양이 만들어진 이후에 형성된다.",
+                answer: "O", options: ["X", "O"],
+                explanation: "태양계 성운이 수축하면서 중심부에는 원시 태양이 먼저 형성되고, 그 주변에 남아있던 가스와 먼지들이 원반을 이룬 후 뭉쳐져 미행성체를 거쳐 원시 행성들이 순차적으로 형성되었습니다."
+            },
+            {
+                id: 23, type: 'ox', text: "23. 미행성체는 크기가 매우 작은 행성으로 보통 수 km 정도이다.",
+                answer: "O", options: ["O", "X"],
+                explanation: "미행성체는 원시 태양계 원반에서 먼지와 암석 조각들이 뭉쳐져 형성된 수 km에서 수십 km 크기의 작은 천체들로, 이들이 더 충돌하고 합쳐져 원시 행성으로 성장했습니다."
+            },
+            {
+                id: 24, type: 'fill-in', text: "24. 태양계 성운은 (   )하여 납작한 (   )을 만든다.",
+                answer: "회전;원반", options: ["팽창;구", "수축;고리", "회전;원반", "폭발;나선팔"],
+                explanation: "태양계를 형성한 거대한 성운은 자체 중력으로 수축하면서 각운동량 보존 법칙에 따라 회전 속도가 빨라지고, 원심력의 영향으로 중심축 방향으로는 납작해져 중심부에는 원시 태양이, 그 주변에는 회전하는 가스와 먼지로 된 원반(원시 행성계 원반)이 형성됩니다."
+            },
+            {
+                id: 25, type: 'fill-in', text: "25. 미행성체가 충돌하면 온도는 (   ), 크기는 (   )한다.",
+                answer: "증가;증가", options: ["감소;감소", "증가;증가", "일정;감소", "증가;일정"],
+                explanation: "미행성체들이 서로 충돌하고 합쳐지면 더 큰 천체로 성장하므로 크기는 증가합니다. 또한 충돌 시 운동 에너지가 열에너지로 전환되어 천체의 온도가 상승합니다."
+            },
+            {
+                id: 26, type: 'fill-in', text: "26. 태양과 가까운 곳에서는 주로 (   )과 (   )으로 이루어진 (   ) 행성이 형성",
+                answer: "암석;금속;지구형", options: ["가스;얼음;목성형", "암석;금속;지구형", "수소;헬륨;가스형", "규산염;물;암석형"],
+                explanation: "원시 태양 근처는 온도가 매우 높아 가벼운 기체나 얼음 성분은 증발해 버리고, 녹는점이 높은 규산염 암석 성분과 철, 니켈과 같은 금속 성분들이 남아 뭉쳐져 수성, 금성, 지구, 화성과 같은 밀도가 큰 암석형 행성(지구형 행성)을 형성했습니다."
+            },
+            {
+                id: 27, type: 'fill-in', text: "27. 태양과 먼 곳에서는 주로 (   )와 (   )으로 이루어진 (   ) 행성이 형성",
+                answer: "수소;헬륨;목성형", options: ["암석;금속;지구형", "산소;질소;대기형", "수소;헬륨;목성형", "물;메테인;얼음형"],
+                explanation: "태양에서 멀리 떨어진 곳은 온도가 매우 낮아 수소, 헬륨과 같은 가벼운 기체뿐만 아니라 물, 메테인, 암모니아 등의 얼음 성분들이 응결하여 존재할 수 있었습니다. 이들이 풍부한 물질을 끌어모아 목성, 토성, 천왕성, 해왕성과 같은 거대한 가스형 또는 얼음형 행성(목성형 행성)을 형성했습니다."
+            },
+            {
+                id: 28, type: 'fill-in', text: "28. 원시 지구는 미행성체의 충돌로 인해 온도가 매우 (   )아, 녹아 있는 (   ) 상태 이다.",
+                answer: "높;마그마의바다", options: ["낮;얼음", "높;마그마의바다", "일정;암석", "변동;가스"],
+                explanation: "원시 지구는 형성 초기에 수많은 미행성체들의 충돌이 계속되면서 그 충돌 에너지로 인해 표면 온도가 매우 높았습니다. 이로 인해 지구 전체가 녹아 액체 상태의 암석, 즉 마그마로 뒤덮인 '마그마의 바다' 상태였을 것으로 추정됩니다."
+            },
+            {
+                id: 29, type: 'fill-in', text: "29. 핵을 구성하는 물질에는 (   )이 있으며 밀도가 대체로 (   )다.",
+                answer: "철;크", options: ["규소;작", "산소;보통", "철;크", "알루미늄;작"],
+                explanation: "마그마 바다 상태에서 밀도가 큰 철(Fe)과 니켈(Ni) 같은 금속 성분들은 중력의 영향으로 지구 중심부로 가라앉아 핵을 형성했습니다. 따라서 핵은 밀도가 매우 큽니다."
+            },
+            {
+                id: 30, type: 'fill-in', text: "30. 맨틀과 지각을 구성하는 물질에는 (   )와 (   )가 있으며 밀도가 대체로 (   )다.",
+                answer: "산소;규소;작", options: ["철;니켈;크", "수소;헬륨;매우 작", "산소;규소;작", "마그네슘;황;보통"],
+                explanation: "핵을 이루는 무거운 금속 성분들이 가라앉은 후, 상대적으로 밀도가 작은 규산염 광물(주로 산소와 규소 화합물)들이 위로 떠올라 맨틀과 지각을 형성했습니다."
+            },
+            {
+                id: 31, type: 'fill-in', text: "31. 원시 지구에서 먼저 형성된 것은 원시 지각과 원시 바다 중 (   )이다.",
+                answer: "원시지각", options: ["원시 바다", "동시에 형성", "알 수 없음", "원시지각"],
+                explanation: "마그마 바다 상태였던 원시 지구가 점차 식으면서 표면부터 굳기 시작하여 얇은 원시 지각이 먼저 형성되었습니다. 이후 화산 활동으로 방출된 수증기가 응결하여 비가 내리고, 이 물이 낮은 곳에 고여 원시 바다가 형성된 것으로 봅니다."
+            },
+            {
+                id: 32, type: 'ox', text: "32. 태양계 성운에는 탄소, 산소, 규소, 철등의 무거운 원소가 포함된다.",
+                answer: "O", options: ["X", "O"],
+                explanation: "태양계 성운은 주로 수소와 헬륨으로 이루어져 있었지만, 이전 세대 별들의 진화와 초신성 폭발 등을 통해 생성된 탄소, 산소, 규소, 철과 같은 다양한 무거운 원소들도 먼지나 가스 형태로 포함하고 있었습니다. 이 무거운 원소들이 지구형 행성과 생명체의 재료가 되었습니다."
+            },
+            {
+                id: 33, type: 'fill-in', text: "33. 지구를 구성하는 주요 원소를 많은 순서대로 쓰면 (   ), (   ), (   )",
+                answer: "철;산소;규소", options: ["산소;규소;알루미늄", "철;산소;규소", "수소;헬륨;탄소", "질소;산소;아르곤"],
+                explanation: "지구 전체 질량을 기준으로 가장 많은 원소는 철(Fe, 약 32.1%)이며, 그 다음으로 산소(O, 약 30.1%), 규소(Si, 약 15.1%), 마그네슘(Mg, 약 13.9%) 순입니다. 철은 주로 핵에 집중되어 있습니다."
+            },
+            {
+                id: 34, type: 'fill-in', text: "34. 생명체를 구성하는 주요 원소를 많은 순서대로 쓰면 (   ), (   ), (   )",
+                answer: "산소;탄소;수소", options: ["탄소;수소;질소", "산소;탄소;수소", "수소;헬륨;산소", "철;산소;마그네슘"],
+                explanation: "생명체(특히 사람의 경우)를 구성하는 원소 중 질량비로 가장 많은 것은 산소(O, 약 65%)이며, 그 다음으로 탄소(C, 약 18.5%), 수소(H, 약 9.5%), 질소(N, 약 3.2%) 순입니다. 이들은 주로 물, 단백질, 탄수화물, 지방, 핵산 등의 형태로 존재합니다."
+            }
+        ];
+
+        // 명언 목록
+        const motivationalQuotes = [
+            "오늘의 노력이 내일의 너를 만든다.", "포기하지 않는 한, 실패는 없다.", "가장 큰 위험은 아무 위험도 감수하지 않는 것이다.",
+            "배움은 의무도, 생존도 아니다. 그것은 우리의 가장 큰 특권이다.", "성공은 최종 목적지가 아니며, 실패는 치명적이지 않다. 중요한 것은 계속 나아가는 용기다.",
+            "작은 성공들이 모여 큰 성공을 이룬다.", "어제보다 나은 오늘, 오늘보다 나은 내일을 만들자.",
+            "가장 큰 영광은 한 번도 실패하지 않음이 아니라 실패할 때마다 다시 일어서는 데에 있다.", "천리길도 한 걸음부터.", "노력은 결코 배신하지 않는다."
+        ];
+
+        const quizElement = document.getElementById('quiz');
+        const paginationControlsElement = document.getElementById('pagination-controls');
+        const submitPageButton = document.getElementById('submit-page-btn');
+        const scoreSectionElement = document.getElementById('score-section');
+        const currentPageScoreTextElement = document.getElementById('current-page-score-text');
+        const totalScoreTextElement = document.getElementById('total-score-text');
+        const pageInfoElement = document.getElementById('page-info');
+        const quizMainTitleDisplayElement = document.getElementById('quiz-main-title-in-score');
+        const motivationalQuoteElement = document.getElementById('motivational-quote'); 
+        
+        const welcomePopup = document.getElementById('welcome-popup');
+        const popupPasswordInput = document.getElementById('popup-password');
+        const popupConfirmButton = document.getElementById('popup-confirm');
+        const popupErrorMessage = document.getElementById('popup-error');
+
+        const correctPassword = "0407"; 
+
+        const questionsPerPage = 10; 
+        let currentPage = 0;
+        let pageScores = []; 
+        let pageAttempted = []; 
+
+        function initializeQuizData() {
+            questions.forEach(q => {
+                q.userAnswer = null;
+                q.isCorrect = null;
+                q.attemptedThisSession = false; 
+                if (q.answer && q.answer.includes(';')) {
+                    q.answersArray = q.answer.split(';');
+                } else if (q.answer) {
+                    q.answersArray = [q.answer];
+                } else {
+                    q.answersArray = [];
+                }
+            });
+            const numPages = Math.ceil(questions.length / questionsPerPage);
+            pageAttempted = new Array(numPages).fill(false);
+            pageScores = new Array(numPages).fill(0);
+        }
+
+
+        function renderQuestionsForPage(page) {
+            quizElement.innerHTML = ''; 
+            currentPage = page;
+
+            const start = page * questionsPerPage;
+            const end = Math.min(start + questionsPerPage, questions.length);
+            const questionsOnPage = questions.slice(start, end);
+
+            pageInfoElement.textContent = `총 ${questions.length}문제 중 ${start + 1} - ${end}번 문제`;
+
+
+            questionsOnPage.forEach((q, indexOnPage) => {
+                const questionCard = document.createElement('div');
+                questionCard.classList.add('question-card');
+                questionCard.id = `question-${q.id}`;
+
+                const questionText = document.createElement('p');
+                questionText.classList.add('question-text');
+                let questionHTML = q.text;
+                if (q.answersArray && q.answersArray.length > 1) { 
+                    let blankCount = 0;
+                    questionHTML = q.text.replace(/(\(\s*(?:[^)]*)\s*\))/g, (match) => {
+                        blankCount++;
+                        return `<span class="blank-emphasis">( ${"&nbsp;&nbsp;&nbsp;".repeat(q.answersArray[blankCount-1] ? q.answersArray[blankCount-1].length/2 +1 : 3)} )</span>`;
+                    });
+                } else { 
+                     questionHTML = q.text.replace(/(\(\s*(?:[^)]*)\s*\))/g, '<span class="blank-emphasis">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</span>');
+                }
+                questionText.innerHTML = questionHTML; 
+                questionCard.appendChild(questionText);
+
+                const optionsContainer = document.createElement('div');
+                optionsContainer.classList.add('options');
+
+                q.options.forEach(option => {
+                    const optionId = `q${String(q.id).replace(/[^a-zA-Z0-9]/g, '')}-option-${option.replace(/[^a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣$]/g, '')}`;
+                    
+                    const radioInput = document.createElement('input');
+                    radioInput.type = 'radio';
+                    radioInput.id = optionId;
+                    radioInput.name = `question-${q.id}`; 
+                    radioInput.value = option; 
+                    radioInput.classList.add('option-input', 'hidden');
+                    if (q.userAnswer === option) radioInput.checked = true; 
+                    if (pageAttempted[currentPage]) radioInput.disabled = true;
+
+                    const optionLabel = document.createElement('label');
+                    optionLabel.htmlFor = optionId;
+                    optionLabel.innerHTML = option.includes(';') ? option.split(';').join(', ') : option; 
+                    optionLabel.classList.add('option-label');
+                    if (pageAttempted[currentPage]) optionLabel.classList.add('opacity-70', 'cursor-not-allowed');
+
+                    optionsContainer.appendChild(radioInput);
+                    optionsContainer.appendChild(optionLabel);
+                });
+                questionCard.appendChild(optionsContainer);
+
+                const feedbackElement = document.createElement('div');
+                feedbackElement.classList.add('feedback');
+                feedbackElement.style.display = 'none'; 
+                questionCard.appendChild(feedbackElement);
+                
+                if (pageAttempted[currentPage] && q.attemptedThisSession) {
+                    showFeedbackForQuestion(q, questionCard);
+                }
+                quizElement.appendChild(questionCard);
+            });
+            
+            const numPages = Math.ceil(questions.length / questionsPerPage);
+            if (numPages > 1) {
+                paginationControlsElement.style.display = 'flex';
+                renderPaginationControls();
+            } else {
+                paginationControlsElement.style.display = 'none';
+            }
+
+
+            submitPageButton.disabled = pageAttempted[currentPage];
+            if (pageAttempted[currentPage]) {
+                submitPageButton.textContent = '채점 완료';
+                scoreSectionElement.style.display = 'block'; 
+                updateScoreDisplay(); 
+                showMotivationalQuote(); 
+            } else {
+                submitPageButton.textContent = '이번 페이지 채점하기'; 
+                motivationalQuoteElement.style.display = 'none'; 
+                if (questionsOnPage.length > 0) { 
+                     scoreSectionElement.style.display = 'none';
+                } else { 
+                     scoreSectionElement.style.display = 'block';
+                     currentPageScoreTextElement.textContent = '이번 페이지에 문제가 없습니다.';
+                     totalScoreTextElement.textContent = '';
+                }
+            }
+        }
+        
+        function showFeedbackForQuestion(question, questionCard) {
+            const feedbackElement = questionCard.querySelector('.feedback');
+            if (!feedbackElement) return;
+
+            feedbackElement.innerHTML = ''; 
+            const correctAnswerText = question.answersArray.join(', ');
+
+            if (question.isCorrect) {
+                feedbackElement.innerHTML = '<strong class="font-semibold">정답입니다!</strong> 🎉';
+                feedbackElement.className = 'feedback correct';
+            } else {
+                feedbackElement.innerHTML = `<strong class="font-semibold">오답입니다.</strong> 정답은 "<span class="font-bold text-red-700">${correctAnswerText}</span>"입니다.`;
+                feedbackElement.className = 'feedback incorrect';
+            }
+
+            const explanationElement = document.createElement('p');
+            explanationElement.classList.add('explanation');
+            explanationElement.innerHTML = `<strong class="font-semibold">해설:</strong> ${question.explanation}`; 
+            feedbackElement.appendChild(explanationElement);
+            feedbackElement.style.display = 'block';
+        }
+
+        function renderPaginationControls() {
+            paginationControlsElement.innerHTML = '';
+            const numPages = Math.ceil(questions.length / questionsPerPage);
+
+            const prevButton = document.createElement('button');
+            prevButton.textContent = '이전';
+            prevButton.disabled = currentPage === 0;
+            prevButton.onclick = () => renderQuestionsForPage(currentPage - 1);
+            paginationControlsElement.appendChild(prevButton);
+
+            for (let i = 0; i < numPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i + 1;
+                pageButton.classList.add('page-number');
+                if (i === currentPage) {
+                    pageButton.classList.add('current');
+                }
+                pageButton.onclick = () => renderQuestionsForPage(i);
+                paginationControlsElement.appendChild(pageButton);
+            }
+
+            const nextButton = document.createElement('button');
+            nextButton.textContent = '다음';
+            nextButton.disabled = currentPage === numPages - 1;
+            nextButton.onclick = () => renderQuestionsForPage(currentPage + 1);
+            paginationControlsElement.appendChild(nextButton);
+        }
+
+        function showMotivationalQuote() {
+            const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
+            motivationalQuoteElement.textContent = motivationalQuotes[randomIndex];
+            motivationalQuoteElement.style.display = 'block';
+        }
+
+        submitPageButton.addEventListener('click', () => {
+            if (pageAttempted[currentPage]) return; 
+
+            let scoreForThisPage = 0;
+            
+            const start = currentPage * questionsPerPage;
+            const end = Math.min(start + questionsPerPage, questions.length);
+            const questionsOnPage = questions.slice(start, end);
+
+            questionsOnPage.forEach((q, indexOnPage) => {
+                const questionCard = quizElement.children[indexOnPage]; 
+                const selectedOptionInput = questionCard.querySelector(`input[name="question-${q.id}"]:checked`);
+                
+                q.attemptedThisSession = true;
+
+                if (selectedOptionInput) {
+                    q.userAnswer = selectedOptionInput.value; 
+                    q.isCorrect = (q.userAnswer === q.answer); 
+                                        
+                    if (q.isCorrect) {
+                        scoreForThisPage++; 
+                    }
+                    showFeedbackForQuestion(q, questionCard);
+
+                    const radioInputs = questionCard.querySelectorAll('input[type="radio"]');
+                    radioInputs.forEach(input => input.disabled = true);
+                } else {
+                    const feedbackElement = questionCard.querySelector('.feedback');
+                    feedbackElement.textContent = '답을 선택하지 않았습니다.';
+                    feedbackElement.className = 'feedback incorrect';
+                    feedbackElement.style.display = 'block';
+                    q.isCorrect = false; 
+                }
+            });
+            
+            pageScores[currentPage] = scoreForThisPage;
+            pageAttempted[currentPage] = true;
+            submitPageButton.disabled = true;
+            submitPageButton.textContent = '채점 완료';
+            
+            scoreSectionElement.style.display = 'block';
+            updateScoreDisplay();
+            showMotivationalQuote(); 
+
+            const quizContainerElement = document.querySelector('.quiz-container');
+            if (quizContainerElement) {
+                quizContainerElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+
+        function updateScoreDisplay() {
+            const questionsOnThisPageCount = Math.min(questionsPerPage, questions.length - (currentPage * questionsPerPage)); 
+            currentPageScoreTextElement.textContent = `이번 페이지 점수: ${pageScores[currentPage]} / ${questionsOnThisPageCount}`;
+            
+            let currentTotalScore = 0;
+            let currentTotalAttemptedQuestions = 0;
+            for(let i=0; i < pageAttempted.length; i++){
+                if(pageAttempted[i]){
+                    const start = i * questionsPerPage;
+                    const end = Math.min(start + questionsPerPage, questions.length);
+                    currentTotalAttemptedQuestions += (end-start);
+                    currentTotalScore += pageScores[i];
+                }
+            }
+
+            const quizTitleElement = document.querySelector('h1'); 
+            let quizMainTitle = "현재 단원";
+            if (quizTitleElement) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = quizTitleElement.innerHTML; 
+                quizMainTitle = tempDiv.textContent || tempDiv.innerText || "";
+                const titleParts = quizMainTitle.split('(');
+                if (titleParts.length > 0) {
+                    quizMainTitle = titleParts[0].trim();
+                }
+            }
+            
+            if (quizMainTitleDisplayElement) { 
+                quizMainTitleDisplayElement.textContent = quizMainTitle;
+            }
+
+            if (currentTotalAttemptedQuestions > 0) {
+                 totalScoreTextElement.style.display = 'block'; 
+                 totalScoreTextElement.textContent = `총 누적 점수: ${currentTotalScore} / ${currentTotalAttemptedQuestions}`;
+            } else {
+                 totalScoreTextElement.style.display = 'none'; 
+            }
+        }
+        
+        // 팝업 기능
+        window.onload = () => {
+            if (welcomePopup) {
+                // 각 퀴즈 페이지마다 고유한 sessionStorage 키 사용
+                const popupSessionKey = 'appiaQuizPasswordEntered_stellar_evolution_1_34'; 
+                const popupShownThisSession = sessionStorage.getItem(popupSessionKey); 
+                if (!popupShownThisSession) { 
+                    welcomePopup.classList.add('show');
+                } else {
+                    initializeQuizData();
+                    renderQuestionsForPage(0);
+                }
+            } else { 
+                initializeQuizData();
+                renderQuestionsForPage(0);
+            }
+        };
+
+        if (popupConfirmButton) {
+            popupConfirmButton.addEventListener('click', () => {
+                if (popupPasswordInput.value === correctPassword) {
+                    if (welcomePopup) {
+                        welcomePopup.classList.remove('show');
+                    }
+                    const popupSessionKey = 'appiaQuizPasswordEntered_stellar_evolution_1_34';
+                    sessionStorage.setItem(popupSessionKey, 'true'); 
+                    initializeQuizData(); 
+                    renderQuestionsForPage(0);
+                } else {
+                    if (popupErrorMessage) {
+                        popupErrorMessage.textContent = "비밀번호가 틀렸습니다. 다시 시도해주세요.";
+                    }
+                    popupPasswordInput.value = ''; 
+                    popupPasswordInput.focus(); 
+                }
+            });
+        }
+        
+        if (popupPasswordInput) {
+            popupPasswordInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); 
+                    popupConfirmButton.click();
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>

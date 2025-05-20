@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2.1.1 물질과 규칙성 - 우주초기에 생성된 원소 (1-51번)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .question-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .question-text .blank-emphasis { 
+            font-weight: bold;
+            color: #3b82f6; 
+        }
+        .option-label {
+            display: block;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            background-color: #f7fafc;
+        }
+        .option-label:hover {
+            background-color: #e2e8f0;
+        }
+        .option-input:checked + .option-label {
+            background-color: #4299e1;
+            color: white;
+            border-color: #2b6cb0;
+        }
+        .feedback {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+        .feedback.correct {
+            background-color: #c6f6d5;
+            color: #2f855a;
+            border: 1px solid #9ae6b4;
+        }
+        .feedback.incorrect {
+            background-color: #fed7d7;
+            color: #c53030;
+            border: 1px solid #fbb6ce;
+        }
+        .explanation {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+        .action-button {
+            background-color: #4a5568;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: none;
+            margin-top: 1rem;
+            margin-right: 0.5rem;
+        }
+        .action-button:hover:not(:disabled) {
+            background-color: #2d3748;
+        }
+        .action-button:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+        .pagination-controls {
+            display: flex; 
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        .pagination-controls button, .pagination-controls span {
+            margin: 0 0.25rem;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        .pagination-controls button:disabled {
+            background-color: #e2e8f0;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .pagination-controls .page-number.current {
+            background-color: #4299e1;
+            color: white;
+            border-color: #2b6cb0;
+            font-weight: bold;
+        }
+        .score-section {
+            margin-top: 1.5rem;
+            padding: 1.5rem; 
+            background-color: #e9f5ff;
+            border-radius: 8px;
+            text-align: left;
+        }
+        .score-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+        }
+        .quiz-title-in-score {
+            font-size: 1.1rem; 
+            font-weight: bold;
+            color: #1e40af; 
+            margin-bottom: 0.75rem; 
+        }
+        .motivational-quote { 
+            font-size: 1rem;
+            font-style: italic;
+            color: #374151; 
+            margin-top: 1.5rem; 
+            padding-top: 1rem;
+            border-top: 1px dashed #cbd5e0; 
+            text-align: center;
+        }
+        h1 { 
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a202c;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .page-info {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        /* 팝업 스타일 */
+        .popup-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); display: flex;
+            justify-content: center; align-items: center; z-index: 1000; 
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .popup-overlay.show { opacity: 1; visibility: visible; }
+        .popup-content {
+            background-color: white; padding: 2.5rem; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); text-align: center;
+            max-width: 420px; width: 90%;
+        }
+        .popup-content h2 {
+            font-size: 1.75rem; font-weight: 700; color: #1a202c; margin-bottom: 1rem;
+        }
+        .popup-content p.welcome-message {
+            font-size: 1rem; color: #4a5568; margin-bottom: 1.5rem; line-height: 1.6;
+        }
+        .popup-password-input {
+            width: 100%; padding: 0.75rem; margin-bottom: 1rem;
+            border: 1px solid #cbd5e0; border-radius: 6px; font-size: 1rem;
+            box-sizing: border-box; 
+        }
+        .popup-confirm-btn {
+            background-color: #3b82f6; color: white; padding: 0.75rem 1.5rem;
+            border-radius: 8px; font-weight: 500; cursor: pointer;
+            transition: background-color 0.2s; border: none; width: 100%;
+            font-size: 1rem;
+        }
+        .popup-confirm-btn:hover { background-color: #2563eb; }
+        .popup-error-message {
+            color: #ef4444; font-size: 0.875rem; margin-top: 0.75rem;
+            min-height: 1.25rem; 
+        }
+    </style>
+</head>
+<body>
+    <div id="welcome-popup" class="popup-overlay">
+        <div class="popup-content">
+            <h2>Appia 과학학원</h2>
+            <p class="welcome-message">유선종 선생님의 학습 자료입니다.<br>비밀번호를 입력해주세요.</p>
+            <input type="password" id="popup-password" class="popup-password-input" placeholder="비밀번호">
+            <button id="popup-confirm" class="popup-confirm-btn">확인</button>
+            <p id="popup-error" class="popup-error-message"></p>
+        </div>
+    </div>
+    <div class="quiz-container">
+        <h1>2.1.1 물질과 규칙성 - 우주초기에 생성된 원소 (48p ~ 53p)</h1>
+        <div class="page-info" id="page-info"></div>
+        <div id="quiz">
+            </div>
+        <div class="pagination-controls" id="pagination-controls">
+            </div>
+        <button id="submit-page-btn" class="action-button w-full sm:w-auto mx-auto block">이번 페이지 채점하기</button>
+        <div class="score-section" id="score-section" style="display: none;">
+            <p class="score-text quiz-title-in-score" id="quiz-main-title-in-score"></p> 
+            <p class="score-text" id="current-page-score-text"></p>
+            <p class="score-text" id="total-score-text"></p>
+            <p class="motivational-quote" id="motivational-quote" style="display: none;"></p> 
+        </div>
+    </div>
+
+    <script>
+        // 문제 데이터 (PDF "2.1.1 물질과 규칙성 - 우주초기에 생성된 원소.pdf" 기준)
+        const questions = [
+            {
+                id: 1, type: 'fill-in', text: "1. 광원에서 나온 빛이 프리즘을 통과하면 (   ) 스펙트럼이 관측 된다.",
+                answer: "연속", options: ["방출", "흡수", "연속", "선"],
+                explanation: "백색광과 같이 여러 파장의 빛이 섞인 광원에서 나온 빛이 프리즘을 통과하면 파장에 따라 빛이 분산되어 연속적인 색의 띠인 연속 스펙트럼이 나타납니다."
+            },
+            {
+                id: 2, type: 'fill-in', text: "2. (   )이란 빛이 분광기를 통과할 때 (   )에 따라 나누어져 나타나는 색의 띠",
+                answer: "스펙트럼;파장", options: ["빛;세기", "스펙트럼;파장", "무지개;굴절률", "프리즘;색깔"],
+                explanation: "스펙트럼은 빛을 파장에 따라 분해했을 때 나타나는 색의 띠를 의미합니다."
+            },
+            {
+                id: 3, type: 'fill-in', text: "3. 백열등에서 나온 빛이 프리즘을 통과하면 (   ) 스펙트럼",
+                answer: "연속", options: ["방출", "흡수", "불연속", "연속"],
+                explanation: "백열등은 고온의 필라멘트에서 나오는 빛으로, 다양한 파장의 빛을 포함하고 있어 프리즘을 통과하면 연속 스펙트럼을 만듭니다."
+            },
+            {
+                id: 4, type: 'fill-in', text: "4. 고온의 기체에서 방출한 빛이 프리즘을 통과하면 (   ) 스펙트럼",
+                answer: "방출", options: ["흡수", "연속", "방출", "간섭"],
+                explanation: "고온의 기체는 특정 파장의 빛만을 방출하며, 이 빛을 프리즘으로 분광하면 특정 위치에만 밝은 선들이 나타나는 방출 스펙트럼(선 스펙트럼)을 관찰할 수 있습니다."
+            },
+            {
+                id: 5, type: 'fill-in', text: "5. 기체 방전관에서 나온 빛이 프리즘을 통과하면 (   ) 스펙트럼",
+                answer: "방출", options: ["연속", "회절", "흡수", "방출"],
+                explanation: "기체 방전관은 특정 기체에 높은 전압을 걸어 빛을 내게 하는 장치로, 기체의 종류에 따라 고유한 파장의 빛을 방출하므로 방출 스펙트럼이 나타납니다."
+            },
+            {
+                id: 6, type: 'fill-in', text: "6. 저온의 기체를 통과할 때 나타나는 것은 (   ) 스펙트럼",
+                answer: "흡수", options: ["방출", "연속", "흡수", "반사"],
+                explanation: "연속 스펙트럼을 내는 광원에서 나온 빛이 저온의 기체를 통과하면, 기체 원자들이 특정 파장의 빛을 흡수하여 그 부분만 검은 선으로 나타나는 흡수 스펙트럼이 관찰됩니다."
+            },
+            {
+                id: 7, type: 'fill-in', text: "7. 연속 스펙트럼을 배경으로 검은 선이 나타나면 (   ) 스펙트럼",
+                answer: "흡수", options: ["방출", "혼합", "간섭", "흡수"],
+                explanation: "흡수 스펙트럼은 연속적인 빛의 배경 위에 특정 파장의 빛이 흡수되어 검은 선(흡수선)으로 나타나는 스펙트럼입니다."
+            },
+            {
+                id: 8, type: 'fill-in', text: "8. 검은 배경에 밝은 선이 나타나면 (   ) 스펙트럼",
+                answer: "방출", options: ["흡수", "연속", "방출", "산란"],
+                explanation: "방출 스펙트럼은 검은 배경 위에 특정 파장의 빛만 밝은 선(방출선)으로 나타나는 스펙트럼입니다."
+            },
+            {
+                id: 9, type: 'fill-in', text: "9. [복자] (   ) 상태의 원자에서 방출되는 빛을 관찰하면 (   ) 스펙트럼",
+                answer: "들뜬;방출", options: ["바닥;흡수", "이온화된;연속", "들뜬;방출", "안정한;혼합"],
+                explanation: "원자가 에너지를 흡수하여 전자가 더 높은 에너지 준위로 올라간 상태를 '들뜬 상태'라고 합니다. 들뜬 상태의 원자는 불안정하여 다시 바닥 상태로 내려오면서 특정 파장의 빛을 방출하고, 이것이 방출 스펙트럼으로 관찰됩니다."
+            },
+            {
+                id: 10, type: 'fill-in', text: "10. 프라운호퍼 선은 (   ) 스펙트럼이다.",
+                answer: "흡수", options: ["방출", "연속", "전자기", "흡수"],
+                explanation: "프라운호퍼 선은 태양 빛의 연속 스펙트럼 배경에 나타나는 수많은 검은 선들로, 태양의 대기나 지구 대기의 저온 기체들이 특정 파장의 빛을 흡수하여 생긴 흡수 스펙트럼입니다."
+            },
+            {
+                id: 11, type: 'fill-in', text: "11. 태양의 스펙트럼은 (   ) 스펙트럼이다.",
+                answer: "흡수", options: ["방출", "흡수", "연속", "감마선"],
+                explanation: "태양 빛은 중심부에서 나온 연속 스펙트럼의 빛이 상대적으로 차가운 태양 대기를 통과하면서 특정 파장이 흡수되어 흡수 스펙트럼의 형태로 관측됩니다."
+            },
+            {
+                id: 12, type: 'fill-in', text: "12. 프라운호퍼 선을 분석하면 (   )의 대기 성분을 알 수 있다.",
+                answer: "태양", options: ["지구", "달", "태양", "별"],
+                explanation: "프라운호퍼 선의 위치와 세기를 분석하면 태양 대기를 구성하는 원소의 종류와 양을 알 수 있습니다. 각 원소는 고유한 파장의 빛을 흡수하기 때문입니다."
+            },
+            {
+                id: 13, type: 'fill-in', text: "13. 태양의 스펙트럼에서 검은 선들이 나타나는 까닭은 태양의 (   )를 통과했기 때문",
+                answer: "대기", options: ["핵", "표면", "코로나", "대기"],
+                explanation: "태양의 중심부에서 나오는 빛은 연속 스펙트럼이지만, 이 빛이 태양의 상대적으로 차가운 바깥층 대기를 통과하면서 대기 중의 원소들이 특정 파장의 빛을 흡수하여 검은 선(흡수선)이 나타납니다."
+            },
+            {
+                id: 14, type: 'fill-in', text: "14. 원소의 종류는 선의 (   )로, 원소의 양은 선의 (   )으로 알 수 있다.",
+                answer: "위치;선폭", options: ["개수;밝기", "위치;선폭", "색깔;간격", "수;온도"],
+                explanation: "스펙트럼에서 나타나는 선의 위치(파장)는 원소마다 고유하므로 원소의 종류를, 선의 폭이나 세기(밝기)는 해당 원소의 양(밀도)에 비례하므로 원소의 상대적인 양을 추정할 수 있습니다."
+            },
+            {
+                id: 15, type: 'fill-in', text: "15. 태양을 구성하는 대기의 주요 원소에는 (   )와 (   )이 있다.",
+                answer: "수소;헬륨", options: ["산소;질소", "철;니켈", "수소;헬륨", "탄소;규소"],
+                explanation: "태양은 주로 수소(약 75%)와 헬륨(약 24%)으로 이루어져 있으며, 그 외 미량의 다른 원소들을 포함하고 있습니다."
+            },
+            {
+                id: 16, type: 'ox', text: "16. 모든 원소는 스펙트럼 선의 위치가 다르다.",
+                answer: "O", options: ["X", "O"],
+                explanation: "각 원소는 고유한 에너지 준위 구조를 가지고 있어, 빛을 흡수하거나 방출할 때 나타나는 스펙트럼 선의 위치(파장)가 모두 다릅니다. 이는 원소의 '지문'과 같습니다."
+            },
+            {
+                id: 17, type: 'fill-in', text: "17. 나트륨의 방출 스펙트럼에서는 (   ) 빛이 강하게 나타난다.",
+                answer: "노란색", options: ["빨간색", "초록색", "파란색", "노란색"],
+                explanation: "나트륨(소듐)을 불꽃에 넣거나 방전시키면 특유의 밝은 노란색 빛(D-선, 약 589nm)을 강하게 방출합니다."
+            },
+            {
+                id: 18, type: 'fill-in', text: "18. 산소의 방출 스펙트럼에서는 (   )색 빛이 강하게 나타난다.",
+                answer: "초록", options: ["붉은", "노란", "초록", "보라"],
+                explanation: "산소는 방전 시 여러 파장의 빛을 내지만, 특정 조건에서 초록색 계열(예: 오로라의 초록빛 약 557.7nm)의 빛이 강하게 나타날 수 있습니다."
+            },
+            {
+                id: 19, type: 'fill-in', text: "19. 오로라의 초록색 빛은 (   ) 원소 때문이다.",
+                answer: "산소", options: ["질소", "수소", "산소", "헬륨"],
+                explanation: "오로라의 아름다운 빛깔 중 가장 흔한 초록색과 붉은색은 주로 지구 상층 대기의 산소 원자가 태양풍 입자와 충돌하여 들뜬 후 빛을 방출하면서 나타나는 현상입니다."
+            },
+            {
+                id: 20, type: 'fill-in', text: "20. 쿼크와 전자를 (   )라 한다.",
+                answer: "기본입자", options: ["복합입자", "원자", "기본입자", "분자"],
+                explanation: "현재까지 알려진 바로는 쿼크와 렙톤(전자, 뮤온, 타우온 및 각각의 중성미자)은 더 이상 작은 입자로 쪼개지지 않는 가장 기본적인 입자로, 이들을 기본입자라고 합니다."
+            },
+            {
+                id: 21, type: 'ox', text: "21. 모든 물질은 기본입자들로 구성되어 있다.",
+                answer: "O", options: ["O", "X"],
+                explanation: "표준모형에 따르면 우주의 모든 물질은 쿼크와 렙톤이라는 기본입자들과 이들 사이의 힘을 매개하는 입자들로 구성되어 있습니다."
+            },
+            {
+                id: 22, type: 'fill-in', text: "22. (   )은 외부 은하를 관측해 현재 우주가 (   )하고 있다는 사실을 밝혀냄",
+                answer: "허블;팽창", options: ["아인슈타인;수축", "허블;팽창", "가모프;정지", "뉴턴;회전"],
+                explanation: "에드윈 허블은 외부 은하들의 스펙트럼에서 적색편이를 관측하고, 은하까지의 거리와 후퇴 속도가 비례한다는 허블의 법칙을 발견하여 우주가 팽창하고 있음을 실험적으로 증명했습니다."
+            },
+            {
+                id: 23, type: 'fill-in', text: "23. (   )는 모든 물질과 에너지가 모인 한 점에서 우주가 시작되었다는 (   )우주론을 주장하였다.",
+                answer: "가모프;빅뱅", options: ["허블;정상", "호킹;다중", "가모프;빅뱅", "펜지어스;인플레이션"],
+                explanation: "조지 가모프는 허블의 우주 팽창 관측을 바탕으로, 과거로 갈수록 우주는 더 작고 뜨거웠을 것이며, 태초에 모든 물질과 에너지가 한 점에 모여 있다가 대폭발(빅뱅)을 통해 팽창하기 시작했다는 빅뱅 우주론을 발전시켰습니다."
+            },
+            {
+                id: 24, type: 'fill-in', text: "24. 양성자와 중성자는 (   ) 3개의 조합으로 만들어진다.",
+                answer: "쿼크", options: ["전자", "중성미자", "광자", "쿼크"],
+                explanation: "양성자는 업 쿼크 2개와 다운 쿼크 1개 (uud)로, 중성자는 업 쿼크 1개와 다운 쿼크 2개 (udd)로 구성된 복합입자입니다."
+            },
+            {
+                id: 25, type: 'fill-in', text: "25. 빅뱅은 약 (   )억년 전 대폭발로 시작되었다.",
+                answer: "138", options: ["46", "138", "100", "200"],
+                explanation: "현재까지의 관측 결과를 종합하면, 우주는 약 138억 년 전에 빅뱅이라는 대폭발을 통해 시작된 것으로 추정됩니다."
+            },
+            {
+                id: 26, type: 'fill-in', text: "26. 빅뱅 후 우주의 밀도는 (   ), 부피는 (   ), 질량은 (   )하다.",
+                answer: "감소;증가;일정", options: ["증가;감소;변화", "감소;증가;일정", "일정;일정;증가", "감소;감소;감소"],
+                explanation: "빅뱅 이후 우주는 계속 팽창하고 있으므로 부피는 증가합니다. 우주 전체의 질량(또는 에너지 총량)은 보존된다고 가정하면, 부피가 커지므로 밀도(질량/부피)는 감소하고, 질량은 일정하게 유지됩니다."
+            },
+            {
+                id: 27, type: 'fill-in', text: "27. 수소 원자핵과 헬륨 원자핵의 질량비는 약 (   )이다.",
+                answer: "3:1", options: ["1:1", "1:3", "3:1", "4:1"],
+                explanation: "빅뱅 우주론에 따르면, 우주 초기에 생성된 수소 원자핵과 헬륨 원자핵의 질량비는 약 3:1(개수비로는 약 12:1)이며, 이는 실제 관측 결과와 잘 일치하여 빅뱅 우주론의 중요한 증거가 됩니다."
+            },
+            {
+                id: 28, type: 'ox', text: "28. 현재 우주의 온도는 약 3000K 이다.",
+                answer: "X", options: ["O", "X"],
+                explanation: "현재 우주의 온도는 빅뱅 이후 계속 낮아져 약 2.7K (켈빈) 정도입니다. 이는 우주 배경 복사의 온도로 관측됩니다. 3000K는 원자가 생성될 당시 우주의 온도입니다."
+            },
+            {
+                id: 29, type: 'fill-in', text: "29. 원자가 만들어진 시기는 빅뱅 후 약 (   ) 만년 무렵이다.",
+                answer: "38", options: ["3", "100", "1", "38"],
+                explanation: "빅뱅 후 약 38만 년이 지나 우주의 온도가 약 3000K로 낮아지면서, 빠르게 움직이던 전자가 원자핵(주로 수소, 헬륨 원자핵)에 붙잡혀 중성 원자가 만들어지기 시작했습니다."
+            },
+            {
+                id: 30, type: 'fill-in', text: "30. (   )의 생성 이후 빛이 우주 공간으로 퍼져날 수 있었다.",
+                answer: "원자", options: ["쿼크", "양성자", "별", "원자"],
+                explanation: "원자가 생성되기 이전에는 우주가 뜨겁고 밀도가 높아 자유 전자가 빛과 자주 상호작용하여 빛이 직진하지 못하는 '불투명한 우주'였습니다. 원자 생성 후 자유 전자가 줄어들면서 빛이 비로소 자유롭게 퍼져나갈 수 있는 '투명한 우주'가 되었고, 이때 퍼져나간 빛이 우주 배경 복사입니다."
+            },
+            {
+                id: 31, type: 'fill-in', text: "31. 우주 공간으로 퍼져나간 빛을 (   )라 부른다.",
+                answer: "우주배경복사", options: ["감마선 폭발", "별빛", "우주배경복사", "은하광"],
+                explanation: "빅뱅 후 약 38만 년, 우주의 온도가 약 3000K일 때 원자가 형성되면서 빛이 자유롭게 퍼져나가기 시작했는데, 이 빛이 우주 팽창과 함께 파장이 길어져 현재는 약 2.7K의 마이크로파 형태로 관측되며, 이를 우주 배경 복사라고 합니다."
+            },
+            {
+                id: 32, type: 'ox', text: "32. 기본 입자는 더 이상 분해할 수 없다.",
+                answer: "O", options: ["X", "O"],
+                explanation: "기본 입자는 현재까지 알려진 물리 이론(표준 모형)에서 내부 구조가 없고 더 이상 다른 입자로 분해되지 않는 가장 기본적인 구성 요소를 의미합니다."
+            },
+            {
+                id: 33, type: 'fill-in', text: "33. 양성자는 (u)쿼크 (   )개와 (d)쿼크 (   )개로 이루어진다.",
+                answer: "2;1", options: ["1;2", "2;1", "3;0", "0;3"],
+                explanation: "양성자는 전하량이 +2/3e인 업 쿼크(u) 2개와 전하량이 -1/3e인 다운 쿼크(d) 1개로 구성되어 총 전하량 +1e를 가집니다 (uud)."
+            },
+            {
+                id: 34, type: 'fill-in', text: "34. 중성자는 (u)쿼크 (   )개와 (d)쿼크 (   )개로 이루어진다.",
+                answer: "1;2", options: ["2;1", "1;2", "0;3", "3;0"],
+                explanation: "중성자는 업 쿼크(u) 1개와 다운 쿼크(d) 2개로 구성되어 총 전하량 0을 가집니다 (udd)."
+            },
+            {
+                id: 35, type: 'fill-in', text: "35. 양성자와 중성자 중 전기를 띤 입자는 (   )이다.",
+                answer: "양성자", options: ["중성자", "둘 다", "양성자", "둘 다 아님"],
+                explanation: "양성자는 +1의 기본 전하량(약 +1.6 × 10<sup>-19</sup>C)을 띠는 입자이고, 중성자는 이름 그대로 전기적으로 중성인 입자입니다."
+            },
+            {
+                id: 36, type: 'fill-in', text: "36. 양성자는 그 자체로 (   )이 된다.",
+                answer: "수소원자핵", options: ["헬륨원자핵", "전자", "수소원자핵", "중성자"],
+                explanation: "가장 흔한 수소 동위원소(경수소)의 원자핵은 양성자 1개로만 이루어져 있습니다. 따라서 양성자 자체를 수소 원자핵이라고 할 수 있습니다."
+            },
+            {
+                id: 37, type: 'ox', text: "37. 수소 원자핵과 헬륨 원자핵은 동시에 만들어진다.",
+                answer: "X", options: ["O", "X"],
+                explanation: "빅뱅 초기에는 양성자(수소 원자핵)와 중성자가 먼저 만들어지고, 이후 우주의 온도가 충분히 낮아진 빅뱅 후 약 3분경에 이 양성자와 중성자들이 결합하여 헬륨 원자핵 등이 합성되기 시작했습니다."
+            },
+            {
+                id: 38, type: 'fill-in', text: "38. 헬륨 원자핵은 양성자 (   )개와 중성자 (   )개로 이루어진다.",
+                answer: "2;2", options: ["1;1", "2;1", "1;2", "2;2"],
+                explanation: "가장 안정적이고 흔한 헬륨 동위원소인 헬륨-4(<sup>4</sup>He)의 원자핵은 양성자 2개와 중성자 2개로 구성됩니다."
+            },
+            {
+                id: 39, type: 'fill-in', text: "39. 헬륨 원자핵의 생성은 빅뱅 후 약 (   )분 무렵이다.",
+                answer: "3", options: ["38만", "1", "3", "10억"],
+                explanation: "빅뱅 후 약 3분이 지나 우주의 온도가 약 10<sup>9</sup>K 정도로 낮아지면서, 양성자와 중성자가 결합하여 중수소, 삼중수소, 헬륨-3, 헬륨-4 등의 가벼운 원자핵들이 합성되는 '빅뱅 핵합성'이 일어났습니다."
+            },
+            {
+                id: 40, type: 'ox', text: "40. 우주 초기 양성자와 중성자의 수는 비슷하다.",
+                answer: "O", options: ["X", "O"],
+                explanation: "빅뱅 직후 매우 뜨거운 상태에서는 양성자와 중성자가 서로 변환될 수 있어 그 수가 거의 비슷했습니다. 하지만 우주가 식으면서 질량이 약간 더 큰 중성자가 양성자로 붕괴하는 반응이 더 우세해져 양성자의 비율이 점차 높아졌습니다."
+            },
+            {
+                id: 41, type: 'ox', text: "41. 헬륨 원자핵의 생성 무렵 중성자의 수는 양성자보다 많다.",
+                answer: "X", options: ["O", "X"],
+                explanation: "헬륨 원자핵이 생성될 무렵(빅뱅 후 약 3분)에는 이미 중성자 중 일부가 양성자로 붕괴하여 양성자의 수가 중성자보다 많아진 상태였습니다. 대략 양성자와 중성자의 개수비는 7:1 정도였습니다."
+            },
+            {
+                id: 42, type: 'fill-in', text: "42. [복자] 빅뱅 우주론에서 예측한 수소와 헬륨의 질량비는 (   )",
+                answer: "3:1", options: ["1:1", "1:3", "4:1", "3:1"],
+                explanation: "빅뱅 핵합성 이론은 초기 우주에서 수소 원자핵(양성자)과 헬륨 원자핵이 약 3:1의 질량비로 생성되었을 것이라고 예측하며, 이는 실제 우주에서 관측되는 수소와 헬륨의 존재비와 매우 잘 일치합니다."
+            },
+            {
+                id: 43, type: 'fill-in', text: "43. [복자] 수소와 헬륨의 질량비는 (   )의 증거이다.",
+                answer: "빅뱅우주론", options: ["정상우주론", "일반상대성이론", "빅뱅우주론", "양자역학"],
+                explanation: "우주 전체에 분포하는 수소와 헬륨의 질량비(약 3:1)는 빅뱅 우주론의 예측과 정확히 일치하여, 빅뱅 우주론을 강력하게 지지하는 중요한 관측 증거 중 하나입니다."
+            },
+            {
+                id: 44, type: 'fill-in', text: "44. [복자] 우주 배경 복사는 (   )의 증거이다.",
+                answer: "빅뱅우주론", options: ["끈이론", "다중우주론", "정상우주론", "빅뱅우주론"],
+                explanation: "우주 배경 복사는 빅뱅 직후 뜨거웠던 우주가 식으면서 남겨진 빛의 흔적으로, 그 존재와 온도(약 2.7K), 등방성 등은 빅뱅 우주론을 결정적으로 뒷받침하는 증거입니다."
+            },
+            {
+                id: 45, type: 'ox', text: "45. 허블이 우주가 팽창함을 관측한 것은 가모프가 빅뱅 우주론을 주장하기 이전이다.",
+                answer: "O", options: ["X", "O"],
+                explanation: "에드윈 허블은 1929년에 우주 팽창을 관측적으로 발견했고, 조지 가모프는 이를 바탕으로 1940년대에 빅뱅 우주론을 체계적으로 발전시켰습니다."
+            },
+            {
+                id: 46, type: 'fill-in', text: "46. 수소 원자는 양성자 (   )개와 중성자 (   )개, 전자 (   )개로 구성된다.",
+                answer: "1;0;1", options: ["1;1;1", "1;0;1", "0;1;1", "2;0;2"],
+                explanation: "가장 흔한 수소 동위원소인 경수소(<sup>1</sup>H)는 양성자 1개, 중성자 0개, 전자 1개로 이루어져 있습니다."
+            },
+            {
+                id: 47, type: 'fill-in', text: "47. 헬륨 원자는 양성자 (   )개와 중성자 (   )개, 전자 (   )개로 구성된다.",
+                answer: "2;2;2", options: ["2;1;2", "2;2;2", "1;2;1", "2;2;0"],
+                explanation: "가장 흔한 헬륨 동위원소인 헬륨-4(<sup>4</sup>He)는 원자핵에 양성자 2개와 중성자 2개가 있고, 중성 상태의 원자이므로 전자도 2개를 가집니다."
+            },
+            {
+                id: 48, type: 'ox', text: "48. 우주 배경 복사는 현재 우주의 모든 방향에서 대체로 균일한 세기로 관측된다.",
+                answer: "O", options: ["O", "X"],
+                explanation: "우주 배경 복사는 어느 방향에서 관측하든 거의 동일한 온도(약 2.7K)와 세기로 관측되는 매우 등방적인 특징을 보입니다. 이는 초기 우주가 매우 균일했음을 시사합니다. (미세한 비등방성이 존재하며, 이는 구조 형성의 씨앗이 됨)"
+            },
+            {
+                id: 49, type: 'fill-in', text: "49. 불투명한 우주는 (   )의 생성 이전이고, 투명한 우주는 (   )의 생성 이후이다.",
+                answer: "원자;원자", options: ["별;별", "은하;은하", "쿼크;쿼크", "원자;원자"],
+                explanation: "빅뱅 후 약 38만 년, 우주의 온도가 약 3000K로 낮아져 원자가 생성되기 전까지는 자유 전자가 빛과 빈번하게 상호작용하여 빛이 직진할 수 없는 '불투명한 우주'였습니다. 원자가 생성된 후에는 빛이 자유롭게 퍼져나갈 수 있는 '투명한 우주'가 되었습니다."
+            },
+            {
+                id: 50, type: 'fill-in', text: "50. 수소 원자와 헬륨 원자핵 중 먼저 만들어진 것은 (   )이다.",
+                answer: "헬륨 원자핵", options: ["수소 원자", "헬륨 원자핵", "둘 다 동시에", "알 수 없음"],
+                explanation: "빅뱅 초기(약 1초 이내)에 양성자(수소 원자핵)와 중성자가 만들어졌고, 이후 빅뱅 후 약 3분경에 이들이 결합하여 헬륨 원자핵 등이 합성되었습니다. 중성 수소 원자나 중성 헬륨 원자는 그보다 훨씬 뒤인 빅뱅 후 약 38만 년경에 전자가 원자핵에 붙잡히면서 만들어졌습니다."
+            },
+            {
+                id: 51, type: 'ox', text: "51. 우주의 별과 은하는 원자가 생성 된 이후에 만들어 졌다.",
+                answer: "O", options: ["X", "O"],
+                explanation: "원자가 생성되어 우주가 투명해진 후, 중력의 영향으로 물질이 모이기 시작하여 점차 별과 은하와 같은 구조들이 형성되었습니다. 이는 원자 생성 이후 수억 년이 지난 시점부터 본격화되었습니다."
+            }
+        ];
+
+        // 명언 목록
+        const motivationalQuotes = [
+            "오늘의 노력이 내일의 너를 만든다.", "포기하지 않는 한, 실패는 없다.", "가장 큰 위험은 아무 위험도 감수하지 않는 것이다.",
+            "배움은 의무도, 생존도 아니다. 그것은 우리의 가장 큰 특권이다.", "성공은 최종 목적지가 아니며, 실패는 치명적이지 않다. 중요한 것은 계속 나아가는 용기다.",
+            "작은 성공들이 모여 큰 성공을 이룬다.", "어제보다 나은 오늘, 오늘보다 나은 내일을 만들자.",
+            "가장 큰 영광은 한 번도 실패하지 않음이 아니라 실패할 때마다 다시 일어서는 데에 있다.", "천리길도 한 걸음부터.", "노력은 결코 배신하지 않는다."
+        ];
+
+        const quizElement = document.getElementById('quiz');
+        const paginationControlsElement = document.getElementById('pagination-controls');
+        const submitPageButton = document.getElementById('submit-page-btn');
+        const scoreSectionElement = document.getElementById('score-section');
+        const currentPageScoreTextElement = document.getElementById('current-page-score-text');
+        const totalScoreTextElement = document.getElementById('total-score-text');
+        const pageInfoElement = document.getElementById('page-info');
+        const quizMainTitleDisplayElement = document.getElementById('quiz-main-title-in-score');
+        const motivationalQuoteElement = document.getElementById('motivational-quote'); 
+        
+        const welcomePopup = document.getElementById('welcome-popup');
+        const popupPasswordInput = document.getElementById('popup-password');
+        const popupConfirmButton = document.getElementById('popup-confirm');
+        const popupErrorMessage = document.getElementById('popup-error');
+
+        const correctPassword = "0407"; 
+
+        const questionsPerPage = 10; 
+        let currentPage = 0;
+        let pageScores = []; 
+        let pageAttempted = []; 
+
+        function initializeQuizData() {
+            questions.forEach(q => {
+                q.userAnswer = null;
+                q.isCorrect = null;
+                q.attemptedThisSession = false; 
+                if (q.answer && q.answer.includes(';')) {
+                    q.answersArray = q.answer.split(';');
+                } else if (q.answer) {
+                    q.answersArray = [q.answer];
+                } else {
+                    q.answersArray = [];
+                }
+            });
+            const numPages = Math.ceil(questions.length / questionsPerPage);
+            pageAttempted = new Array(numPages).fill(false);
+            pageScores = new Array(numPages).fill(0);
+        }
+
+
+        function renderQuestionsForPage(page) {
+            quizElement.innerHTML = ''; 
+            currentPage = page;
+
+            const start = page * questionsPerPage;
+            const end = Math.min(start + questionsPerPage, questions.length);
+            const questionsOnPage = questions.slice(start, end);
+
+            pageInfoElement.textContent = `총 ${questions.length}문제 중 ${start + 1} - ${end}번 문제`;
+
+
+            questionsOnPage.forEach((q, indexOnPage) => {
+                const questionCard = document.createElement('div');
+                questionCard.classList.add('question-card');
+                questionCard.id = `question-${q.id}`;
+
+                const questionText = document.createElement('p');
+                questionText.classList.add('question-text');
+                let questionHTML = q.text;
+                if (q.answersArray && q.answersArray.length > 1) { 
+                    let blankCount = 0;
+                    questionHTML = q.text.replace(/(\(\s*(?:[^)]*)\s*\))/g, (match) => {
+                        blankCount++;
+                        return `<span class="blank-emphasis">( ${"&nbsp;&nbsp;&nbsp;".repeat(q.answersArray[blankCount-1] ? q.answersArray[blankCount-1].length/2 +1 : 3)} )</span>`;
+                    });
+                } else { 
+                     questionHTML = q.text.replace(/(\(\s*(?:[^)]*)\s*\))/g, '<span class="blank-emphasis">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</span>');
+                }
+                questionText.innerHTML = questionHTML; 
+                questionCard.appendChild(questionText);
+
+                const optionsContainer = document.createElement('div');
+                optionsContainer.classList.add('options');
+
+                q.options.forEach(option => {
+                    const optionId = `q${String(q.id).replace(/[^a-zA-Z0-9]/g, '')}-option-${option.replace(/[^a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣$]/g, '')}`;
+                    
+                    const radioInput = document.createElement('input');
+                    radioInput.type = 'radio';
+                    radioInput.id = optionId;
+                    radioInput.name = `question-${q.id}`; 
+                    radioInput.value = option; 
+                    radioInput.classList.add('option-input', 'hidden');
+                    if (q.userAnswer === option) radioInput.checked = true; 
+                    if (pageAttempted[currentPage]) radioInput.disabled = true;
+
+                    const optionLabel = document.createElement('label');
+                    optionLabel.htmlFor = optionId;
+                    optionLabel.innerHTML = option.includes(';') ? option.split(';').join(', ') : option; 
+                    optionLabel.classList.add('option-label');
+                    if (pageAttempted[currentPage]) optionLabel.classList.add('opacity-70', 'cursor-not-allowed');
+
+                    optionsContainer.appendChild(radioInput);
+                    optionsContainer.appendChild(optionLabel);
+                });
+                questionCard.appendChild(optionsContainer);
+
+                const feedbackElement = document.createElement('div');
+                feedbackElement.classList.add('feedback');
+                feedbackElement.style.display = 'none'; 
+                questionCard.appendChild(feedbackElement);
+                
+                if (pageAttempted[currentPage] && q.attemptedThisSession) {
+                    showFeedbackForQuestion(q, questionCard);
+                }
+                quizElement.appendChild(questionCard);
+            });
+            
+            // MathJax는 더 이상 필요하지 않을 수 있으므로 주석 처리 또는 삭제
+            // if (typeof MathJax !== "undefined") {
+            //     MathJax.Hub.Queue(["Typeset", MathJax.Hub, quizElement]);
+            // }
+
+            const numPages = Math.ceil(questions.length / questionsPerPage);
+            if (numPages > 1) {
+                paginationControlsElement.style.display = 'flex';
+                renderPaginationControls();
+            } else {
+                paginationControlsElement.style.display = 'none';
+            }
+
+
+            submitPageButton.disabled = pageAttempted[currentPage];
+            if (pageAttempted[currentPage]) {
+                submitPageButton.textContent = '채점 완료';
+                scoreSectionElement.style.display = 'block'; 
+                updateScoreDisplay(); 
+                showMotivationalQuote(); 
+            } else {
+                submitPageButton.textContent = '이번 페이지 채점하기'; 
+                motivationalQuoteElement.style.display = 'none'; 
+                if (questionsOnPage.length > 0) { 
+                     scoreSectionElement.style.display = 'none';
+                } else { 
+                     scoreSectionElement.style.display = 'block';
+                     currentPageScoreTextElement.textContent = '이번 페이지에 문제가 없습니다.';
+                     totalScoreTextElement.textContent = '';
+                }
+            }
+        }
+        
+        function showFeedbackForQuestion(question, questionCard) {
+            const feedbackElement = questionCard.querySelector('.feedback');
+            if (!feedbackElement) return;
+
+            feedbackElement.innerHTML = ''; 
+            const correctAnswerText = question.answersArray.join(', ');
+
+            if (question.isCorrect) {
+                feedbackElement.innerHTML = '<strong class="font-semibold">정답입니다!</strong> 🎉';
+                feedbackElement.className = 'feedback correct';
+            } else {
+                feedbackElement.innerHTML = `<strong class="font-semibold">오답입니다.</strong> 정답은 "<span class="font-bold text-red-700">${correctAnswerText}</span>"입니다.`;
+                feedbackElement.className = 'feedback incorrect';
+            }
+
+            const explanationElement = document.createElement('p');
+            explanationElement.classList.add('explanation');
+            explanationElement.innerHTML = `<strong class="font-semibold">해설:</strong> ${question.explanation}`; 
+            feedbackElement.appendChild(explanationElement);
+            feedbackElement.style.display = 'block';
+            
+            // MathJax는 더 이상 필요하지 않을 수 있으므로 주석 처리 또는 삭제
+            // if (typeof MathJax !== "undefined") {
+            //     MathJax.Hub.Queue(["Typeset", MathJax.Hub, feedbackElement]);
+            // }
+        }
+
+        function renderPaginationControls() {
+            paginationControlsElement.innerHTML = '';
+            const numPages = Math.ceil(questions.length / questionsPerPage);
+
+            const prevButton = document.createElement('button');
+            prevButton.textContent = '이전';
+            prevButton.disabled = currentPage === 0;
+            prevButton.onclick = () => renderQuestionsForPage(currentPage - 1);
+            paginationControlsElement.appendChild(prevButton);
+
+            for (let i = 0; i < numPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i + 1;
+                pageButton.classList.add('page-number');
+                if (i === currentPage) {
+                    pageButton.classList.add('current');
+                }
+                pageButton.onclick = () => renderQuestionsForPage(i);
+                paginationControlsElement.appendChild(pageButton);
+            }
+
+            const nextButton = document.createElement('button');
+            nextButton.textContent = '다음';
+            nextButton.disabled = currentPage === numPages - 1;
+            nextButton.onclick = () => renderQuestionsForPage(currentPage + 1);
+            paginationControlsElement.appendChild(nextButton);
+        }
+
+        function showMotivationalQuote() {
+            const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
+            motivationalQuoteElement.textContent = motivationalQuotes[randomIndex];
+            motivationalQuoteElement.style.display = 'block';
+        }
+
+        submitPageButton.addEventListener('click', () => {
+            if (pageAttempted[currentPage]) return; 
+
+            let scoreForThisPage = 0;
+            
+            const start = currentPage * questionsPerPage;
+            const end = Math.min(start + questionsPerPage, questions.length);
+            const questionsOnPage = questions.slice(start, end);
+
+            questionsOnPage.forEach((q, indexOnPage) => {
+                const questionCard = quizElement.children[indexOnPage]; 
+                const selectedOptionInput = questionCard.querySelector(`input[name="question-${q.id}"]:checked`);
+                
+                q.attemptedThisSession = true;
+
+                if (selectedOptionInput) {
+                    q.userAnswer = selectedOptionInput.value; 
+                    q.isCorrect = (q.userAnswer === q.answer); 
+                                        
+                    if (q.isCorrect) {
+                        scoreForThisPage++; 
+                    }
+                    showFeedbackForQuestion(q, questionCard);
+
+                    const radioInputs = questionCard.querySelectorAll('input[type="radio"]');
+                    radioInputs.forEach(input => input.disabled = true);
+                } else {
+                    const feedbackElement = questionCard.querySelector('.feedback');
+                    feedbackElement.textContent = '답을 선택하지 않았습니다.';
+                    feedbackElement.className = 'feedback incorrect';
+                    feedbackElement.style.display = 'block';
+                    q.isCorrect = false; 
+                }
+            });
+            
+            pageScores[currentPage] = scoreForThisPage;
+            pageAttempted[currentPage] = true;
+            submitPageButton.disabled = true;
+            submitPageButton.textContent = '채점 완료';
+            
+            scoreSectionElement.style.display = 'block';
+            updateScoreDisplay();
+            showMotivationalQuote(); 
+
+            const quizContainerElement = document.querySelector('.quiz-container');
+            if (quizContainerElement) {
+                quizContainerElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+
+        function updateScoreDisplay() {
+            const questionsOnThisPageCount = Math.min(questionsPerPage, questions.length - (currentPage * questionsPerPage)); 
+            currentPageScoreTextElement.textContent = `이번 페이지 점수: ${pageScores[currentPage]} / ${questionsOnThisPageCount}`;
+            
+            let currentTotalScore = 0;
+            let currentTotalAttemptedQuestions = 0;
+            for(let i=0; i < pageAttempted.length; i++){
+                if(pageAttempted[i]){
+                    const start = i * questionsPerPage;
+                    const end = Math.min(start + questionsPerPage, questions.length);
+                    currentTotalAttemptedQuestions += (end-start);
+                    currentTotalScore += pageScores[i];
+                }
+            }
+
+            const quizTitleElement = document.querySelector('h1'); 
+            let quizMainTitle = "현재 단원";
+            if (quizTitleElement) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = quizTitleElement.innerHTML; 
+                quizMainTitle = tempDiv.textContent || tempDiv.innerText || "";
+                const titleParts = quizMainTitle.split('(');
+                if (titleParts.length > 0) {
+                    quizMainTitle = titleParts[0].trim();
+                }
+            }
+            
+            if (quizMainTitleDisplayElement) { 
+                quizMainTitleDisplayElement.textContent = quizMainTitle;
+            }
+
+            if (currentTotalAttemptedQuestions > 0) {
+                 totalScoreTextElement.style.display = 'block'; 
+                 totalScoreTextElement.textContent = `총 누적 점수: ${currentTotalScore} / ${currentTotalAttemptedQuestions}`;
+            } else {
+                 totalScoreTextElement.style.display = 'none'; 
+            }
+        }
+        
+        // 팝업 기능
+        window.onload = () => {
+            if (welcomePopup) {
+                // 각 퀴즈 페이지마다 고유한 sessionStorage 키 사용
+                const popupSessionKey = 'appiaQuizPasswordEntered_early_universe_1_51'; 
+                const popupShownThisSession = sessionStorage.getItem(popupSessionKey); 
+                if (!popupShownThisSession) { 
+                    welcomePopup.classList.add('show');
+                } else {
+                    initializeQuizData();
+                    renderQuestionsForPage(0);
+                }
+            } else { 
+                initializeQuizData();
+                renderQuestionsForPage(0);
+            }
+        };
+
+        if (popupConfirmButton) {
+            popupConfirmButton.addEventListener('click', () => {
+                if (popupPasswordInput.value === correctPassword) {
+                    if (welcomePopup) {
+                        welcomePopup.classList.remove('show');
+                    }
+                    const popupSessionKey = 'appiaQuizPasswordEntered_early_universe_1_51';
+                    sessionStorage.setItem(popupSessionKey, 'true'); 
+                    initializeQuizData(); 
+                    renderQuestionsForPage(0);
+                } else {
+                    if (popupErrorMessage) {
+                        popupErrorMessage.textContent = "비밀번호가 틀렸습니다. 다시 시도해주세요.";
+                    }
+                    popupPasswordInput.value = ''; 
+                    popupPasswordInput.focus(); 
+                }
+            });
+        }
+        
+        if (popupPasswordInput) {
+            popupPasswordInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); 
+                    popupConfirmButton.click();
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>

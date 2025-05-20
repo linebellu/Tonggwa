@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1.1.2 과학의 기초 - 측정 표준과 정보 (1-44번)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .question-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .question-text .blank-emphasis { 
+            font-weight: bold;
+            color: #3b82f6; 
+        }
+        .option-label {
+            display: block;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            background-color: #f7fafc;
+        }
+        .option-label:hover {
+            background-color: #e2e8f0;
+        }
+        .option-input:checked + .option-label {
+            background-color: #4299e1;
+            color: white;
+            border-color: #2b6cb0;
+        }
+        .feedback {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+        .feedback.correct {
+            background-color: #c6f6d5;
+            color: #2f855a;
+            border: 1px solid #9ae6b4;
+        }
+        .feedback.incorrect {
+            background-color: #fed7d7;
+            color: #c53030;
+            border: 1px solid #fbb6ce;
+        }
+        .explanation {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+        .action-button {
+            background-color: #4a5568;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: none;
+            margin-top: 1rem;
+            margin-right: 0.5rem;
+        }
+        .action-button:hover:not(:disabled) {
+            background-color: #2d3748;
+        }
+        .action-button:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+        .pagination-controls {
+            display: flex; 
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        .pagination-controls button, .pagination-controls span {
+            margin: 0 0.25rem;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        .pagination-controls button:disabled {
+            background-color: #e2e8f0;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .pagination-controls .page-number.current {
+            background-color: #4299e1;
+            color: white;
+            border-color: #2b6cb0;
+            font-weight: bold;
+        }
+        .score-section {
+            margin-top: 1.5rem;
+            padding: 1.5rem; 
+            background-color: #e9f5ff;
+            border-radius: 8px;
+            text-align: left;
+        }
+        .score-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+        }
+        .quiz-title-in-score {
+            font-size: 1.1rem; 
+            font-weight: bold;
+            color: #1e40af; 
+            margin-bottom: 0.75rem; 
+        }
+        .motivational-quote { 
+            font-size: 1rem;
+            font-style: italic;
+            color: #374151; 
+            margin-top: 1.5rem; 
+            padding-top: 1rem;
+            border-top: 1px dashed #cbd5e0; 
+            text-align: center;
+        }
+        h1 { 
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a202c;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .page-info {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        /* 팝업 스타일 */
+        .popup-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); display: flex;
+            justify-content: center; align-items: center; z-index: 1000; 
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .popup-overlay.show { opacity: 1; visibility: visible; }
+        .popup-content {
+            background-color: white; padding: 2.5rem; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); text-align: center;
+            max-width: 420px; width: 90%;
+        }
+        .popup-content h2 {
+            font-size: 1.75rem; font-weight: 700; color: #1a202c; margin-bottom: 1rem;
+        }
+        .popup-content p.welcome-message {
+            font-size: 1rem; color: #4a5568; margin-bottom: 1.5rem; line-height: 1.6;
+        }
+        .popup-password-input {
+            width: 100%; padding: 0.75rem; margin-bottom: 1rem;
+            border: 1px solid #cbd5e0; border-radius: 6px; font-size: 1rem;
+            box-sizing: border-box; 
+        }
+        .popup-confirm-btn {
+            background-color: #3b82f6; color: white; padding: 0.75rem 1.5rem;
+            border-radius: 8px; font-weight: 500; cursor: pointer;
+            transition: background-color 0.2s; border: none; width: 100%;
+            font-size: 1rem;
+        }
+        .popup-confirm-btn:hover { background-color: #2563eb; }
+        .popup-error-message {
+            color: #ef4444; font-size: 0.875rem; margin-top: 0.75rem;
+            min-height: 1.25rem; 
+        }
+    </style>
+</head>
+<body>
+    <div id="welcome-popup" class="popup-overlay">
+        <div class="popup-content">
+            <h2>Appia 과학학원</h2>
+            <p class="welcome-message">유선종 선생님의 학습 자료입니다.<br>비밀번호를 입력해주세요.</p>
+            <input type="password" id="popup-password" class="popup-password-input" placeholder="비밀번호">
+            <button id="popup-confirm" class="popup-confirm-btn">확인</button>
+            <p id="popup-error" class="popup-error-message"></p>
+        </div>
+    </div>
+    <div class="quiz-container">
+        <h1>1.1.2 과학의 기초 - 측정 표준과 정보 (26p ~ 37p)</h1>
+        <div class="page-info" id="page-info"></div>
+        <div id="quiz">
+            </div>
+        <div class="pagination-controls" id="pagination-controls">
+            </div>
+        <button id="submit-page-btn" class="action-button w-full sm:w-auto mx-auto block">이번 페이지 채점하기</button>
+        <div class="score-section" id="score-section" style="display: none;">
+            <p class="score-text quiz-title-in-score" id="quiz-main-title-in-score"></p> 
+            <p class="score-text" id="current-page-score-text"></p>
+            <p class="score-text" id="total-score-text"></p>
+            <p class="motivational-quote" id="motivational-quote" style="display: none;"></p> 
+        </div>
+    </div>
+
+    <script>
+        // 문제 데이터 (PDF "1.1.2 과학의 기초 - 측정 표준과 정보.pdf" 기준)
+        const questions = [
+            {
+                id: 1, type: 'fill-in', text: "1. (   )은 어떤 대상의 물리량을 기준이 되는 양과 비교해 수치와 단위로 나타내는 것",
+                answer: "측정", options: ["어림", "측정", "분석", "관찰"],
+                explanation: "측정은 도구나 기기를 사용하여 어떤 물리량(길이, 질량, 시간 등)의 값을 정해진 기준(단위)과 비교하여 수치로 표현하는 과정입니다."
+            },
+            {
+                id: 2, type: 'fill-in', text: "2. (   )은 측정 도구 없이 어떠한 양을 추정하는 활동",
+                answer: "어림", options: ["측정", "예측", "가설", "어림"],
+                explanation: "어림은 정확한 측정 도구를 사용하지 않고, 경험이나 직관에 의존하여 물리량의 크기를 대략적으로 짐작하거나 추정하는 것을 말합니다."
+            },
+            {
+                id: 3, type: 'ox', text: "3. 도구에 나타나는 값이나 그 값을 읽는 방법에는 한계가 있다.",
+                answer: "O", options: ["X", "O"],
+                explanation: "모든 측정 도구는 제작상의 한계나 눈금의 정밀도 등으로 인해 측정값에 불확실성이 포함될 수밖에 없습니다. 또한, 측정값을 읽는 사람의 숙련도나 방법에 따라서도 오차가 발생할 수 있습니다."
+            },
+            {
+                id: 4, type: 'ox', text: "4. 측정에는 반올림과 같은 어림이 동반된다.",
+                answer: "O", options: ["O", "X"],
+                explanation: "측정값은 유효숫자를 고려하여 기록해야 하며, 이 과정에서 측정 도구의 최소 눈금보다 작은 값을 읽거나 계산 결과를 정리할 때 반올림과 같은 어림 처리(근사값 처리)가 이루어지기도 합니다."
+            },
+            {
+                id: 5, type: 'fill-in', text: "5. (   )은 정확하고 일관성 있는 측정을 위해 만든 과학적 기준이다.",
+                answer: "측정표준", options: ["단위체계", "실험설계", "측정표준", "과학법칙"],
+                explanation: "측정표준은 측정의 정확성과 통일성을 확보하기 위해 국제적으로 또는 국가적으로 정한 기준을 말합니다. 여기에는 단위의 정의, 표준 물질, 측정 방법 등이 포함됩니다."
+            },
+            {
+                id: 6, type: 'ox', text: "6. 기본량의 기본 단위를 쓰는 것도 측정표준이다.",
+                answer: "O", options: ["X", "O"],
+                explanation: "측정표준에는 각 기본량에 대한 SI 기본 단위의 정의가 포함됩니다. 예를 들어, 1미터(m)의 정의 자체가 측정표준의 일부입니다."
+            },
+            {
+                id: 7, type: 'fill-in', text: "7. (   )은 측정에 있어서 기준이 되는 기본 단위에 대한 정의를 뜻한다.",
+                answer: "측정표준", options: ["물리상수", "측정표준", "자연법칙", "과학원리"],
+                explanation: "측정표준은 측정의 기준이 되는 기본 단위(예: 미터, 킬로그램, 초 등)가 무엇을 의미하는지에 대한 명확한 정의를 포함하며, 이를 통해 모든 측정이 일관되고 비교 가능하게 됩니다."
+            },
+            {
+                id: 8, type: 'ox', text: "8. 서로 다른 단위를 쓰는 것은 측정 표준이다.",
+                answer: "X", options: ["O", "X"],
+                explanation: "측정표준은 오히려 단위를 통일하고 일관성 있게 사용하기 위한 기준입니다. 서로 다른 단위를 혼용하는 것은 측정의 혼란을 야기하므로 측정표준의 목적과 반대됩니다."
+            },
+            {
+                id: 9, type: 'fill-in', text: "9. (   )란 1m에 해당하는 길이를 금속으로 만든 기구이다.",
+                answer: "미터원기", options: ["킬로그램원기", "표준자", "미터원기", "측정기"],
+                explanation: "미터원기는 과거에 길이의 표준으로 사용되었던, 백금-이리듐 합금으로 만들어진 1미터 길이의 막대입니다. 현재는 빛의 속력을 기준으로 미터가 정의됩니다."
+            },
+            {
+                id: 10, type: 'fill-in', text: "10. (   )이란 길이, 질량, 부피 등의 양을 나타내는 단위와 관련된 체계이다.",
+                answer: "도량형", options: ["측정학", "단위계", "규격", "도량형"],
+                explanation: "도량형은 길이, 부피, 무게(질량) 등을 재는 방법이나 이에 사용되는 단위 및 기구를 통틀어 이르는 말입니다. 역사적으로 각 문화권마다 다양한 도량형이 존재했습니다."
+            },
+            {
+                id: 11, type: 'ox', text: "11. 현재 길이의 측정 표준은 미터원기이다.",
+                answer: "X", options: ["X", "O"],
+                explanation: "현재 길이(미터)의 측정 표준은 미터원기가 아니라, 빛이 진공에서 특정 시간(1/299,792,458초) 동안 진행한 거리로 정의됩니다. 이는 더 정확하고 변하지 않는 자연 상수를 기반으로 한 정의입니다."
+            },
+            {
+                id: 12, type: 'fill-in', text: "12. 현재 길이의 측정 표준은 (   )을 이용한다.",
+                answer: "빛", options: ["소리", "원자", "빛", "지구"],
+                explanation: "현재 1미터는 빛이 진공 중에서 1/299,792,458초 동안 진행한 경로의 길이로 정의됩니다. 즉, 빛의 속력이라는 자연 상수를 기준으로 길이를 정의합니다."
+            },
+            {
+                id: 13, type: 'ox', text: "13. 측정 표준은 앞으로도 변함 없이 동일할 것이다.",
+                answer: "X", options: ["O", "X"],
+                explanation: "과학 기술이 발전함에 따라 더 정확하고 안정적인 기준이 발견되면 측정 표준도 개정될 수 있습니다. 실제로 미터, 킬로그램 등의 정의는 역사적으로 여러 번 바뀌어 왔습니다."
+            },
+            {
+                id: 14, type: 'ox', text: "14. 기본 단위에 대한 정의를 측정 표준이라 한다.",
+                answer: "O", options: ["X", "O"],
+                explanation: "측정표준의 핵심 요소 중 하나는 각 SI 기본 단위(미터, 킬로그램, 초 등)가 무엇을 의미하는지에 대한 명확하고 과학적인 정의입니다."
+            },
+            {
+                id: 15, type: 'fill-in', text: "15. 혈당량의 측정 표준은 (mg/dL)을 단위로 측정한다.",
+                answer: "mg/dL", options: ["mmol/L", "g/L", "%", "mg/dL"],
+                explanation: "혈당량은 혈액 속 포도당의 농도를 의미하며, 일반적으로 mg/dL(밀리그램 퍼 데시리터) 또는 mmol/L(밀리몰 퍼 리터) 단위를 사용하여 측정하고 표시합니다. 우리나라에서는 mg/dL을 주로 사용합니다."
+            },
+            {
+                id: 16, type: 'fill-in', text: "16. 미세먼지 농도의 측정 표준은 (μg/m<sup>3</sup>)을 단위로 측정한다.",
+                answer: "μg/m³", options: ["mg/m³", "ppm", "μg/m³", "ppb"],
+                explanation: "미세먼지(PM10)나 초미세먼지(PM2.5)의 농도는 공기 1세제곱미터(m<sup>3</sup>)당 들어있는 먼지의 질량을 마이크로그램(μg)으로 나타낸 μg/m<sup>3</sup> 단위를 표준으로 사용합니다."
+            },
+            {
+                id: 17, type: 'ox', text: "17. 우리 나라에서 기온의 측정 표준은 K을 단위로 한다.",
+                answer: "X", options: ["O", "X"],
+                explanation: "국제단위계(SI)에서 온도의 기본 단위는 켈빈(K)이지만, 우리나라 일상생활이나 기상 예보 등에서는 섭씨온도(℃)를 표준처럼 사용합니다. 과학 분야에서는 K을 사용합니다."
+            },
+            {
+                id: 18, type: 'ox', text: "18. 기본량 중 온도의 기본 단위는 K 이다.",
+                answer: "O", options: ["X", "O"],
+                explanation: "국제단위계(SI)에서 정의하는 7가지 기본량 중 열역학적 온도의 기본 단위는 켈빈(K)입니다."
+            },
+            {
+                id: 19, type: 'ox', text: "19. 우리 나라에서 자동차 속도의 측정 표준은 m/s 이다.",
+                answer: "X", options: ["O", "X"],
+                explanation: "국제단위계(SI)에서 속도의 기본 단위는 m/s(미터 매 초)이지만, 우리나라에서 자동차의 속도는 일상적으로 km/h(킬로미터 매 시) 단위를 사용합니다."
+            },
+            {
+                id: 20, type: 'ox', text: "20. 기본량 중 속도의 기본 단위는 m/s 이다.",
+                answer: "O", options: ["X", "O"],
+                explanation: "속력(또는 속도)은 유도량이지만, 국제단위계(SI)에서 속력의 단위는 m/s(미터 매 초)입니다. 이 단위는 기본 단위인 미터(m)와 초(s)로 구성됩니다."
+            },
+            {
+                id: 21, type: 'ox', text: "21. L는 부피의 기본 단위이다.",
+                answer: "X", options: ["O", "X"],
+                explanation: "리터(L)는 부피의 단위로 널리 사용되지만, 국제단위계(SI)에서 부피의 기본 단위는 세제곱미터(m<sup>3</sup>)입니다. 1L는 0.001m<sup>3</sup> 또는 1dm<sup>3</sup>와 같습니다."
+            },
+            {
+                id: 22, type: 'ox', text: "22. 측정 단위는 측정 표준에 포함된다.",
+                answer: "O", options: ["X", "O"],
+                explanation: "측정표준은 정확하고 일관된 측정을 위한 기준으로, 여기에는 사용할 단위의 정의(예: 1미터는 무엇인가)가 명확하게 포함됩니다."
+            },
+            {
+                id: 23, type: 'ox', text: "23. 측정 방법은 측정 표준에 포함된다.",
+                answer: "O", options: ["O", "X"],
+                explanation: "측정표준에는 특정 물리량을 어떻게 측정해야 하는지에 대한 절차나 방법론도 포함될 수 있습니다. 이는 측정 결과의 신뢰성과 비교 가능성을 높이기 위함입니다."
+            },
+            {
+                id: 24, type: 'ox', text: "24. 측정 도구는 측정 표준에 포함된다.",
+                answer: "O", options: ["X", "O"],
+                explanation: "측정표준은 때때로 특정 측정 도구의 규격이나 교정 방법을 명시하거나, 표준물질(예: 과거의 킬로그램원기) 자체를 기준으로 삼기도 합니다. 이는 도구로 인한 오차를 줄이고 일관성을 유지하기 위함입니다."
+            },
+            {
+                id: 25, type: 'ox', text: "25. 표준 물질은 측정 표준에 포함된다.",
+                answer: "O", options: ["O", "X"],
+                explanation: "표준 물질은 조성이나 물리적 특성이 정확하게 알려진 물질로, 측정 기기를 교정하거나 측정 방법의 정확성을 검증하는 데 사용됩니다. 이러한 표준 물질의 규격과 사용법도 측정표준의 중요한 부분입니다."
+            },
+            {
+                id: 26, type: 'fill-in', text: "26. 우리나라는 동경 135°를 기준으로 하는 (   )를 따른다.",
+                answer: "표준시", options: ["지방시", "세계시", "표준시", "일광절약시간"],
+                explanation: "우리나라의 표준시는 동경 135° 자오선을 기준으로 하며, 이는 협정 세계시(UTC)보다 9시간 빠릅니다 (UTC+9)."
+            },
+            {
+                id: 27, type: 'ox', text: "27. 원자의 크기 측정이나 우주 나이의 측정에서도 측정 표준이 활용된다.",
+                answer: "O", options: ["X", "O"],
+                explanation: "매우 작은 규모(원자 크기)나 매우 큰 규모(우주 나이, 천체까지의 거리)를 측정할 때도 각각의 영역에 맞는 정밀한 측정 방법과 단위, 그리고 이를 뒷받침하는 측정표준이 활용됩니다."
+            },
+            {
+                id: 28, type: 'fill-in', text: "28. 빛의 세기, 소리, 온도, 지진파 등을 (   )라한다.",
+                answer: "신호", options: ["정보", "데이터", "에너지", "신호"],
+                explanation: "신호는 자연 현상이나 인공적인 장치에서 발생하는 변화나 현상이 시간이나 공간에 따라 변하는 형태로, 우리에게 어떤 정보를 전달할 수 있는 물리적인 표현입니다. 빛, 소리, 온도, 전파, 지진파 등이 신호의 예입니다."
+            },
+            {
+                id: 29, type: 'fill-in', text: "29. (   )란 자연에서 일어나는 다양한 변화가 우리에게 전달 되는 것이다.",
+                answer: "신호", options: ["정보", "자극", "신호", "현상"],
+                explanation: "신호는 감각 기관이나 측정 장치를 통해 감지될 수 있는 형태로 에너지가 전달되거나 상태가 변화하는 것을 의미합니다. 이러한 신호를 통해 우리는 주변 환경에 대한 정보를 얻습니다."
+            },
+            {
+                id: 30, type: 'fill-in', text: "30. (   )란 신호를 측정하고 (   )하여 유용한 형태로 만든 것이다.",
+                answer: "정보;분석", options: ["자료;저장", "지식;이해", "정보;분석", "신호;전달"],
+                explanation: "정보는 수집된 신호나 자료(데이터)를 특정 목적에 맞게 해석하고 가공(분석)하여 의미 있고 유용한 형태로 만든 결과물입니다."
+            },
+            {
+                id: 31, type: 'fill-in', text: "31. (   )이란 불연속적인 값을 갖는 형태이다.",
+                answer: "디지털", options: ["아날로그", "연속", "디지털", "이산"],
+                explanation: "디지털은 데이터를 0과 1처럼 명확하게 구분되는 값(이산적인 값)으로 표현하는 방식입니다. 예를 들어 디지털시계는 시간이 1초, 2초 단위로 끊어져서 표시됩니다."
+            },
+            {
+                id: 32, type: 'fill-in', text: "32. (   )란 연속적인 값을 갖는 신호의 형태이다.",
+                answer: "아날로그", options: ["디지털", "불연속", "부호", "아날로그"],
+                explanation: "아날로그는 온도, 소리의 크기, 빛의 밝기처럼 연속적으로 변하는 값을 그대로 표현하는 방식입니다. 예를 들어 수은 온도계의 눈금이나 LP판의 소리골은 아날로그 신호입니다."
+            },
+            {
+                id: 33, type: 'fill-in', text: "33. [복자] 디지털 신호란 0과 1의 (   )로 표시되는 신호이다.",
+                answer: "이진수", options: ["십진수", "문자", "이진수", "기호"],
+                explanation: "디지털 신호는 모든 정보를 두 가지 상태(보통 0과 1)의 조합인 이진수(binary digit, bit)로 표현합니다. 이는 컴퓨터가 정보를 처리하고 저장하는 기본적인 방식입니다."
+            },
+            {
+                id: 34, type: 'fill-in', text: "34. 신호를 저장하거나 재생, 전송하는데 편리한 것은 (   )신호",
+                answer: "디지털", options: ["아날로그", "광학", "음성", "디지털"],
+                explanation: "디지털 신호는 잡음에 강하고, 복제 시 원본 손실이 거의 없으며, 압축 및 편집이 용이하여 저장, 재생, 전송에 매우 유리합니다."
+            },
+            {
+                id: 35, type: 'fill-in', text: "35. 저장에 필요한 용량이 적고, 복사와 편집이 자유로운 것은 (   ) 신호",
+                answer: "디지털", options: ["아날로그", "원본", "디지털", "압축"],
+                explanation: "디지털 신호는 압축 기술을 통해 저장 용량을 줄일 수 있고, 데이터 손실 없이 쉽게 복사하거나 다양한 소프트웨어를 이용해 편집할 수 있다는 장점이 있습니다."
+            },
+            {
+                id: 36, type: 'fill-in', text: "36. (   )는 자연계의 (   )신호를 전기 신호인 (   )신호로 바꾸는 장치",
+                answer: "센서;아날로그;디지털", options: ["변환기;디지털;아날로그", "증폭기;약한;강한", "센서;아날로그;디지털", "필터;잡음;깨끗한"],
+                explanation: "센서는 온도, 빛, 소리 등 자연계의 아날로그 신호를 감지하여 전기 신호로 변환하고, 이 전기 신호는 ADC(아날로그-디지털 변환기)를 통해 컴퓨터가 처리할 수 있는 디지털 신호로 바뀝니다."
+            },
+            {
+                id: 37, type: 'ox', text: "37. 센서를 이용하면 원래 가지고 있던 정보가 손실 없이 변환된다.",
+                answer: "X", options: ["O", "X"],
+                explanation: "센서가 아날로그 신호를 전기 신호로 변환하거나, 이 신호를 다시 디지털 신호로 변환하는 과정(양자화, 샘플링)에서 어느 정도의 정보 손실이나 오차가 발생할 수 있습니다."
+            },
+            {
+                id: 38, type: 'fill-in', text: "38. 지진파는 (   )의 형태로 전달된다.",
+                answer: "파동", options: ["입자", "전류", "파동", "열"],
+                explanation: "지진파는 지진 발생 시 지구 내부의 에너지가 매질(땅, 암석 등)을 통해 사방으로 전파되는 진동, 즉 파동의 한 종류입니다."
+            },
+            {
+                id: 39, type: 'fill-in', text: "39. [복자] 광센서에서 감지하는 신호는 (   )이다.",
+                answer: "적외선", options: ["자외선", "가시광선", "빛", "적외선"],
+                explanation: "광센서는 빛을 감지하며, 종류에 따라 적외선, 가시광선, 자외선 등 특정 파장대의 빛을 감지합니다. 문제의 답은 적외선으로 명시되어 있습니다."
+            },
+            {
+                id: 40, type: 'fill-in', text: "40. [복자] 화학센서에서 감지하는 신호는 (   )이다.",
+                answer: "가스", options: ["액체", "고체", "가스", "냄새"],
+                explanation: "화학 센서는 특정 화학 물질의 존재나 농도를 감지하며, 가스 감지기가 대표적인 예입니다."
+            },
+            {
+                id: 41, type: 'fill-in', text: "41. [복자] 압력센서에서 감지하는 신호는 (   )이다.",
+                answer: "힘", options: ["무게", "변형", "압력", "힘"],
+                explanation: "압력 센서는 특정 면적에 작용하는 힘, 즉 압력을 감지합니다."
+            },
+            {
+                id: 42, type: 'fill-in', text: "42. 열화상 카메라로 감지하는 신호는 (   )이다.",
+                answer: "온도", options: ["열에너지", "적외선", "색깔", "온도"],
+                explanation: "열화상 카메라는 물체가 방출하는 적외선 복사 에너지를 감지하여 이를 온도 정보로 변환하여 보여줍니다."
+            },
+            {
+                id: 43, type: 'fill-in', text: "43. (   )서비스를 통해 여러 사람과 디지털 정보를 공유할 수 있다.",
+                answer: "사회관계망", options: ["클라우드", "이메일", "사회관계망", "인터넷"],
+                explanation: "사회관계망 서비스(SNS)는 온라인상에서 사용자들이 서로 관계를 맺고 다양한 디지털 정보를 생성하고 공유하는 플랫폼입니다."
+            },
+            {
+                id: 44, type: 'fill-in', text: "44. 고대 이집트에서 (   )이라는 팔꿈치부터 가운뎃 손가락까지의 길이를 (   )으로 하여 정교한 피라미드를 건설할 수 있었다.",
+                answer: "큐빗;측정표준", options: ["피트;단위", "야드;기준", "큐빗;측정표준", "뼘;척도"],
+                explanation: "큐빗(cubit)은 고대 이집트에서 사용된 길이의 단위로, 이를 측정표준으로 삼아 피라미드와 같은 건축물을 건설했습니다."
+            }
+        ];
+
+        // 명언 목록
+        const motivationalQuotes = [
+            "오늘의 노력이 내일의 너를 만든다.", "포기하지 않는 한, 실패는 없다.", "가장 큰 위험은 아무 위험도 감수하지 않는 것이다.",
+            "배움은 의무도, 생존도 아니다. 그것은 우리의 가장 큰 특권이다.", "성공은 최종 목적지가 아니며, 실패는 치명적이지 않다. 중요한 것은 계속 나아가는 용기다.",
+            "작은 성공들이 모여 큰 성공을 이룬다.", "어제보다 나은 오늘, 오늘보다 나은 내일을 만들자.",
+            "가장 큰 영광은 한 번도 실패하지 않음이 아니라 실패할 때마다 다시 일어서는 데에 있다.", "천리길도 한 걸음부터.", "노력은 결코 배신하지 않는다."
+        ];
+
+        const quizElement = document.getElementById('quiz');
+        const paginationControlsElement = document.getElementById('pagination-controls');
+        const submitPageButton = document.getElementById('submit-page-btn');
+        const scoreSectionElement = document.getElementById('score-section');
+        const currentPageScoreTextElement = document.getElementById('current-page-score-text');
+        const totalScoreTextElement = document.getElementById('total-score-text');
+        const pageInfoElement = document.getElementById('page-info');
+        const quizMainTitleDisplayElement = document.getElementById('quiz-main-title-in-score');
+        const motivationalQuoteElement = document.getElementById('motivational-quote'); 
+        
+        const welcomePopup = document.getElementById('welcome-popup');
+        const popupPasswordInput = document.getElementById('popup-password');
+        const popupConfirmButton = document.getElementById('popup-confirm');
+        const popupErrorMessage = document.getElementById('popup-error');
+
+        const correctPassword = "0407"; 
+
+        const questionsPerPage = 10; 
+        let currentPage = 0;
+        let pageScores = []; 
+        let pageAttempted = []; 
+
+        function initializeQuizData() {
+            questions.forEach(q => {
+                q.userAnswer = null;
+                q.isCorrect = null;
+                q.attemptedThisSession = false; 
+                if (q.answer && q.answer.includes(';')) {
+                    q.answersArray = q.answer.split(';');
+                } else if (q.answer) {
+                    q.answersArray = [q.answer];
+                } else {
+                    q.answersArray = [];
+                }
+            });
+            const numPages = Math.ceil(questions.length / questionsPerPage);
+            pageAttempted = new Array(numPages).fill(false);
+            pageScores = new Array(numPages).fill(0);
+        }
+
+
+        function renderQuestionsForPage(page) {
+            quizElement.innerHTML = ''; 
+            currentPage = page;
+
+            const start = page * questionsPerPage;
+            const end = Math.min(start + questionsPerPage, questions.length);
+            const questionsOnPage = questions.slice(start, end);
+
+            pageInfoElement.textContent = `총 ${questions.length}문제 중 ${start + 1} - ${end}번 문제`;
+
+
+            questionsOnPage.forEach((q, indexOnPage) => {
+                const questionCard = document.createElement('div');
+                questionCard.classList.add('question-card');
+                questionCard.id = `question-${q.id}`;
+
+                const questionText = document.createElement('p');
+                questionText.classList.add('question-text');
+                let questionHTML = q.text;
+                if (q.answersArray && q.answersArray.length > 1) { 
+                    let blankCount = 0;
+                    questionHTML = q.text.replace(/(\(\s*(?:[^)]*)\s*\))/g, (match) => {
+                        blankCount++;
+                        return `<span class="blank-emphasis">( ${"&nbsp;&nbsp;&nbsp;".repeat(q.answersArray[blankCount-1] ? q.answersArray[blankCount-1].length/2 +1 : 3)} )</span>`;
+                    });
+                } else { 
+                     questionHTML = q.text.replace(/(\(\s*(?:[^)]*)\s*\))/g, '<span class="blank-emphasis">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</span>');
+                }
+                questionText.innerHTML = questionHTML; 
+                questionCard.appendChild(questionText);
+
+                const optionsContainer = document.createElement('div');
+                optionsContainer.classList.add('options');
+
+                q.options.forEach(option => {
+                    const optionId = `q${String(q.id).replace(/[^a-zA-Z0-9]/g, '')}-option-${option.replace(/[^a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣$]/g, '')}`;
+                    
+                    const radioInput = document.createElement('input');
+                    radioInput.type = 'radio';
+                    radioInput.id = optionId;
+                    radioInput.name = `question-${q.id}`; 
+                    radioInput.value = option; 
+                    radioInput.classList.add('option-input', 'hidden');
+                    if (q.userAnswer === option) radioInput.checked = true; 
+                    if (pageAttempted[currentPage]) radioInput.disabled = true;
+
+                    const optionLabel = document.createElement('label');
+                    optionLabel.htmlFor = optionId;
+                    optionLabel.innerHTML = option.includes(';') ? option.split(';').join(', ') : option; 
+                    optionLabel.classList.add('option-label');
+                    if (pageAttempted[currentPage]) optionLabel.classList.add('opacity-70', 'cursor-not-allowed');
+
+                    optionsContainer.appendChild(radioInput);
+                    optionsContainer.appendChild(optionLabel);
+                });
+                questionCard.appendChild(optionsContainer);
+
+                const feedbackElement = document.createElement('div');
+                feedbackElement.classList.add('feedback');
+                feedbackElement.style.display = 'none'; 
+                questionCard.appendChild(feedbackElement);
+                
+                if (pageAttempted[currentPage] && q.attemptedThisSession) {
+                    showFeedbackForQuestion(q, questionCard);
+                }
+                quizElement.appendChild(questionCard);
+            });
+            
+            if (typeof MathJax !== "undefined") {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, quizElement]);
+            }
+
+            const numPages = Math.ceil(questions.length / questionsPerPage);
+            if (numPages > 1) {
+                paginationControlsElement.style.display = 'flex';
+                renderPaginationControls();
+            } else {
+                paginationControlsElement.style.display = 'none';
+            }
+
+
+            submitPageButton.disabled = pageAttempted[currentPage];
+            if (pageAttempted[currentPage]) {
+                submitPageButton.textContent = '채점 완료';
+                scoreSectionElement.style.display = 'block'; 
+                updateScoreDisplay(); 
+                showMotivationalQuote(); 
+            } else {
+                submitPageButton.textContent = '이번 페이지 채점하기'; 
+                motivationalQuoteElement.style.display = 'none'; 
+                if (questionsOnPage.length > 0) { 
+                     scoreSectionElement.style.display = 'none';
+                } else { 
+                     scoreSectionElement.style.display = 'block';
+                     currentPageScoreTextElement.textContent = '이번 페이지에 문제가 없습니다.';
+                     totalScoreTextElement.textContent = '';
+                }
+            }
+        }
+        
+        function showFeedbackForQuestion(question, questionCard) {
+            const feedbackElement = questionCard.querySelector('.feedback');
+            if (!feedbackElement) return;
+
+            feedbackElement.innerHTML = ''; 
+            const correctAnswerText = question.answersArray.join(', ');
+
+            if (question.isCorrect) {
+                feedbackElement.innerHTML = '<strong class="font-semibold">정답입니다!</strong> 🎉';
+                feedbackElement.className = 'feedback correct';
+            } else {
+                feedbackElement.innerHTML = `<strong class="font-semibold">오답입니다.</strong> 정답은 "<span class="font-bold text-red-700">${correctAnswerText}</span>"입니다.`;
+                feedbackElement.className = 'feedback incorrect';
+            }
+
+            const explanationElement = document.createElement('p');
+            explanationElement.classList.add('explanation');
+            explanationElement.innerHTML = `<strong class="font-semibold">해설:</strong> ${question.explanation}`; 
+            feedbackElement.appendChild(explanationElement);
+            feedbackElement.style.display = 'block';
+            
+            if (typeof MathJax !== "undefined") {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, feedbackElement]);
+            }
+        }
+
+        function renderPaginationControls() {
+            paginationControlsElement.innerHTML = '';
+            const numPages = Math.ceil(questions.length / questionsPerPage);
+
+            const prevButton = document.createElement('button');
+            prevButton.textContent = '이전';
+            prevButton.disabled = currentPage === 0;
+            prevButton.onclick = () => renderQuestionsForPage(currentPage - 1);
+            paginationControlsElement.appendChild(prevButton);
+
+            for (let i = 0; i < numPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i + 1;
+                pageButton.classList.add('page-number');
+                if (i === currentPage) {
+                    pageButton.classList.add('current');
+                }
+                pageButton.onclick = () => renderQuestionsForPage(i);
+                paginationControlsElement.appendChild(pageButton);
+            }
+
+            const nextButton = document.createElement('button');
+            nextButton.textContent = '다음';
+            nextButton.disabled = currentPage === numPages - 1;
+            nextButton.onclick = () => renderQuestionsForPage(currentPage + 1);
+            paginationControlsElement.appendChild(nextButton);
+        }
+
+        function showMotivationalQuote() {
+            const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
+            motivationalQuoteElement.textContent = motivationalQuotes[randomIndex];
+            motivationalQuoteElement.style.display = 'block';
+        }
+
+        submitPageButton.addEventListener('click', () => {
+            if (pageAttempted[currentPage]) return; 
+
+            let scoreForThisPage = 0;
+            
+            const start = currentPage * questionsPerPage;
+            const end = Math.min(start + questionsPerPage, questions.length);
+            const questionsOnPage = questions.slice(start, end);
+
+            questionsOnPage.forEach((q, indexOnPage) => {
+                const questionCard = quizElement.children[indexOnPage]; 
+                const selectedOptionInput = questionCard.querySelector(`input[name="question-${q.id}"]:checked`);
+                
+                q.attemptedThisSession = true;
+
+                if (selectedOptionInput) {
+                    q.userAnswer = selectedOptionInput.value; 
+                    q.isCorrect = (q.userAnswer === q.answer); 
+                                        
+                    if (q.isCorrect) {
+                        scoreForThisPage++; 
+                    }
+                    showFeedbackForQuestion(q, questionCard);
+
+                    const radioInputs = questionCard.querySelectorAll('input[type="radio"]');
+                    radioInputs.forEach(input => input.disabled = true);
+                } else {
+                    const feedbackElement = questionCard.querySelector('.feedback');
+                    feedbackElement.textContent = '답을 선택하지 않았습니다.';
+                    feedbackElement.className = 'feedback incorrect';
+                    feedbackElement.style.display = 'block';
+                    q.isCorrect = false; 
+                }
+            });
+            
+            pageScores[currentPage] = scoreForThisPage;
+            pageAttempted[currentPage] = true;
+            submitPageButton.disabled = true;
+            submitPageButton.textContent = '채점 완료';
+            
+            scoreSectionElement.style.display = 'block';
+            updateScoreDisplay();
+            showMotivationalQuote(); 
+
+            const quizContainerElement = document.querySelector('.quiz-container');
+            if (quizContainerElement) {
+                quizContainerElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+
+        function updateScoreDisplay() {
+            const questionsOnThisPageCount = Math.min(questionsPerPage, questions.length - (currentPage * questionsPerPage)); 
+            currentPageScoreTextElement.textContent = `이번 페이지 점수: ${pageScores[currentPage]} / ${questionsOnThisPageCount}`;
+            
+            let currentTotalScore = 0;
+            let currentTotalAttemptedQuestions = 0;
+            for(let i=0; i < pageAttempted.length; i++){
+                if(pageAttempted[i]){
+                    const start = i * questionsPerPage;
+                    const end = Math.min(start + questionsPerPage, questions.length);
+                    currentTotalAttemptedQuestions += (end-start);
+                    currentTotalScore += pageScores[i];
+                }
+            }
+
+            const quizTitleElement = document.querySelector('h1'); 
+            let quizMainTitle = "현재 단원";
+            if (quizTitleElement) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = quizTitleElement.innerHTML; 
+                quizMainTitle = tempDiv.textContent || tempDiv.innerText || "";
+                const titleParts = quizMainTitle.split('(');
+                if (titleParts.length > 0) {
+                    quizMainTitle = titleParts[0].trim();
+                }
+            }
+            
+            if (quizMainTitleDisplayElement) { 
+                quizMainTitleDisplayElement.textContent = quizMainTitle;
+            }
+
+            if (currentTotalAttemptedQuestions > 0) {
+                 totalScoreTextElement.style.display = 'block'; 
+                 totalScoreTextElement.textContent = `총 누적 점수: ${currentTotalScore} / ${currentTotalAttemptedQuestions}`;
+            } else {
+                 totalScoreTextElement.style.display = 'none'; 
+            }
+        }
+        
+        // 팝업 기능
+        window.onload = () => {
+            if (welcomePopup) {
+                // 각 퀴즈 페이지마다 고유한 sessionStorage 키 사용
+                const popupSessionKey = 'appiaQuizPasswordEntered_science_measurement_1_44'; 
+                const popupShownThisSession = sessionStorage.getItem(popupSessionKey); 
+                if (!popupShownThisSession) { 
+                    welcomePopup.classList.add('show');
+                } else {
+                    initializeQuizData();
+                    renderQuestionsForPage(0);
+                }
+            } else { 
+                initializeQuizData();
+                renderQuestionsForPage(0);
+            }
+        };
+
+        if (popupConfirmButton) {
+            popupConfirmButton.addEventListener('click', () => {
+                if (popupPasswordInput.value === correctPassword) {
+                    if (welcomePopup) {
+                        welcomePopup.classList.remove('show');
+                    }
+                    const popupSessionKey = 'appiaQuizPasswordEntered_science_measurement_1_44';
+                    sessionStorage.setItem(popupSessionKey, 'true'); 
+                    initializeQuizData(); 
+                    renderQuestionsForPage(0);
+                } else {
+                    if (popupErrorMessage) {
+                        popupErrorMessage.textContent = "비밀번호가 틀렸습니다. 다시 시도해주세요.";
+                    }
+                    popupPasswordInput.value = ''; 
+                    popupPasswordInput.focus(); 
+                }
+            });
+        }
+        
+        if (popupPasswordInput) {
+            popupPasswordInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); 
+                    popupConfirmButton.click();
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>

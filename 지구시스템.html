@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>통합과학 개념확인(미래엔 교과서) - 아피아과학 학원</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            line-height: 1.7;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            padding-top: 70px; /* 고정 내비게이션 바 높이만큼 패딩 추가 */
+        }
+
+        .navbar {
+            background-color: #34495e;
+            padding: 0 10px; /* 좌우 패딩 약간 줄임 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap; /* 버튼이 많아지면 다음 줄로 */
+        }
+
+        .navbar button {
+            background-color: transparent;
+            color: #ecf0f1;
+            border: none;
+            padding: 15px 12px; /* 버튼 패딩 조절 */
+            cursor: pointer;
+            font-size: 0.9em; /* 폰트 크기 약간 줄임 */
+            font-weight: 500;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap; /* 버튼 텍스트 줄바꿈 방지 */
+        }
+
+        .navbar button:hover {
+            background-color: #4a6572;
+            color: #fff;
+        }
+
+        .navbar button.active-nav {
+            color: #fff;
+            border-bottom: 3px solid #3498db;
+            font-weight: 700;
+        }
+
+        .container {
+            background-color: #fff;
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 25px 35px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.8em; /* 제목 크기 약간 조절 */
+        }
+
+        .page-header .academy-info {
+            color: #555;
+            font-size: 1em; /* 학원 정보 크기 약간 조절 */
+            font-weight: 500;
+        }
+
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 25px;
+            margin-bottom: 20px;
+            font-size: 1.5em; /* 단원 제목 크기 조절 */
+        }
+        h3 {
+            color: #3498db;
+            font-size: 1.2em; /* 문제 유형 제목 크기 조절 */
+            margin-bottom: 15px;
+        }
+        
+        .question p .advanced-marker { /* [심화] 마커 스타일 */
+            color: #e74c3c;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        /* ... (이하 나머지 CSS는 이전과 거의 동일, 필요한 부분만 미세 조정) ... */
+        .question-page { display: none; animation: fadeIn 0.5s ease-in-out; }
+        .question-page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .question { background-color: #f9f9f9; margin-bottom: 20px; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .question p { margin-top: 0; margin-bottom: 12px; font-size: 1.05em; color: #2c3e50; }
+        .options input[type="radio"] { opacity: 0; position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+        .options label { display: block; background-color: #fff; padding: 12px 15px; margin-bottom: 8px; border-radius: 6px; border: 1px solid #d1d9e6; cursor: pointer; transition: all 0.2s ease-in-out; position: relative; }
+        .options label:hover { background-color: #e9f5ff; border-color: #77aaff; }
+        .options label.selected-by-user { background-color: #d1eaff; border-color: #3498db; font-weight: 500; }
+        .options label.selected-by-user span{ color: #2980b9; }
+        .question.correct-q .options label.selected-by-user { background-color: #d4edda !important; border-color: #28a745 !important; }
+        .question.correct-q .options label.selected-by-user span { color: #155724 !important; }
+        .question.correct-q .options label.selected-by-user::after { content: '✔'; color: #28a745; font-weight: bold; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); }
+        .question.incorrect-q .options label.selected-by-user { background-color: #f8d7da !important; border-color: #dc3545 !important; }
+        .question.incorrect-q .options label.selected-by-user span { color: #721c24 !important; }
+        .question.incorrect-q .options label.selected-by-user::after { content: '✖'; color: #dc3545; font-weight: bold; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); }
+        .question.incorrect-q .options label.actual-correct-option { border: 2px solid #28a745 !important; font-weight: 500; }
+        .question.incorrect-q .options label.actual-correct-option span{ color: #155724 !important; }
+        .question.incorrect-q .options label.actual-correct-option::after { content: '정답'; color: #28a745; font-size: 0.85em; font-weight: bold; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background-color: #fff; padding: 0 3px; }
+        .answer-feedback { padding: 10px; margin-top: 10px; border-radius: 6px; font-weight: 500; text-align: left; }
+        .correct-q .answer-feedback { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .incorrect-q .answer-feedback { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .detailed-explanation { display: none; margin-top: 12px; padding: 12px; background-color: #e9ecef; border-radius: 6px; border: 1px solid #ced4da; font-size: 0.95em; color: #495057; }
+        .detailed-explanation strong { color: #34495e; }
+        .detailed-explanation .cite { font-size: 0.85em; color: #6c757d; margin-left: 5px; }
+        .page-score-button { display: block; width: 100%; padding: 12px; background-color: #3498db; color: white; font-size: 1.1em; font-weight: 500; border: none; border-radius: 6px; cursor: pointer; margin-top: 25px; margin-bottom: 15px; transition: background-color 0.2s ease; }
+        .page-score-button:hover:not(:disabled) { background-color: #2980b9; }
+        .page-score-button:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        .page-score-display { text-align: center; font-size: 1.3em; font-weight: bold; margin-top: 15px; padding: 12px; background-color: #e9ecef; border-radius: 6px; color: #495057; }
+        .pagination-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; }
+        .pagination-controls button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; transition: background-color 0.2s ease; }
+        .pagination-controls button:hover:not(:disabled) { background-color: #0056b3; }
+        .pagination-controls button:disabled { background-color: #cccccc; cursor: not-allowed; }
+        .page-info { font-size: 1em; font-weight: 500; color: #555; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar" id="quiz-navbar">
+        <button onclick="navigateToPage(1)" data-page="1" class="active-nav">I.지구시스템(1)</button> <button onclick="navigateToPage(2)" data-page="2">I.지구시스템(2)</button>
+        <button onclick="navigateToPage(3)" data-page="3">I.지구시스템(3)</button>
+        <button onclick="navigateToPage(4)" data-page="4">II.지권변화(1)</button>
+        <button onclick="navigateToPage(5)" data-page="5">II.지권변화(2)</button>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>통합과학 개념확인(미래엔 교과서)</h1> <p class="academy-info">아피아과학 학원 (유선종T)</p> </div>
+
+        <div class="question-page active" id="page-1">
+            <h2>Ⅰ. 지구시스템의 구성과 상호작용 (1/3)</h2>
+            <h3>기본 개념</h3>
+            <div class="question" data-correct-answer="기권" data-type="fill" data-explanation="<strong>기권</strong>은 지구 표면을 둘러싸고 있는 여러 종류의 기체로 이루어진 층으로, 다양한 기상 현상이 나타납니다.">
+                <p>1. 지구 표면을 둘러싸고 있는 대기로, 여러 가지 기체로 이루어져 있으며 기상 현상이 나타나는 권역은 ( )이다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p1_q1" value="수권"> <span>수권</span></label>
+                    <label><input type="radio" name="p1_q1" value="기권"> <span>기권</span></label>
+                    <label><input type="radio" name="p1_q1" value="지권"> <span>지권</span></label>
+                    <label><input type="radio" name="p1_q1" value="생물권"> <span>생물권</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="수권" data-type="fill" data-explanation="<strong>수권</strong>은 바닷물, 강물, 지하수, 빙하 등 지구에 존재하는 모든 물을 포함하며, 생명체의 생존에 필수적입니다.">
+                <p>2. 바닷물, 강물, 지하수, 빙하 등 지구에 있는 물로, 생명체가 살아가는 데 꼭 필요한 권역은 ( )이다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p1_q2" value="기권"> <span>기권</span></label>
+                    <label><input type="radio" name="p1_q2" value="암석권"> <span>암석권</span></label>
+                    <label><input type="radio" name="p1_q2" value="수권"> <span>수권</span></label>
+                    <label><input type="radio" name="p1_q2" value="외권"> <span>외권</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="O" data-type="ox" data-explanation="지구시스템은 기권, 수권, 지권, 생물권 등으로 구성되며, 이들은 서로 영향을 주고받으며 하나의 시스템을 이룹니다.">
+                <p>3. 지구시스템은 태양계의 구성 요소이며, 기권, 수권, 지권, 생물권 등으로 이루어져 있다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p1_q3" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p1_q3" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="X" data-type="ox" data-explanation="<strong>틀렸습니다.</strong> 대류권에서는 대류 현상이 활발하여 구름이 생성되고 비나 눈이 내리는 등 다양한 기상 현상이 일어납니다. (교과서 p.106 기권 설명 참조)">
+                <p>4. 대류권에서는 대류 현상이 일어나지만, 기상 현상은 일어나지 않는다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p1_q4" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p1_q4" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="지권" data-type="fill" data-explanation="<strong>지권</strong>은 지구의 표면(암석, 토양)과 지구 내부 전체를 포함하는 영역으로, 생물에게 서식 공간을 제공합니다.">
+                <p>5. 지구 표면과 지구 내부를 포함한 영역으로, 생명체에게 서식 공간을 제공하는 권역은 ( )이다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p1_q5" value="생물권"> <span>생물권</span></label>
+                    <label><input type="radio" name="p1_q5" value="기권"> <span>기권</span></label>
+                    <label><input type="radio" name="p1_q5" value="수권"> <span>수권</span></label>
+                    <label><input type="radio" name="p1_q5" value="지권"> <span>지권</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="생물권" data-type="fill" data-explanation="<strong>생물권</strong>은 지구에 사는 모든 생명체를 포함하며, 기권, 수권, 지권 등 다양한 영역에 걸쳐 분포합니다.">
+                <p>6. 인간을 포함한 지구에 사는 모든 생명체로, 기권, 수권, 지권에 분포하는 것은 ( )이다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p1_q6" value="광물"> <span>광물</span></label>
+                    <label><input type="radio" name="p1_q6" value="생물권"> <span>생물권</span></label>
+                    <label><input type="radio" name="p1_q6" value="대기권"> <span>대기권</span></label>
+                    <label><input type="radio" name="p1_q6" value="판"> <span>판</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="액체" data-type="fill" data-explanation="행성에 생명체가 존재하기 위한 중요한 조건 중 하나는 <strong>액체</strong> 상태의 물이 풍부하게 존재하는 것입니다. 지구는 이 조건을 만족합니다.">
+                <p>7. 행성에 생명체가 존재하기 위해서는 주변에 안정적으로 에너지를 공급해 주는 별과 ( ) 상태의 물이 있어야 한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p1_q7" value="고체"> <span>고체</span></label>
+                    <label><input type="radio" name="p1_q7" value="기체"> <span>기체</span></label>
+                    <label><input type="radio" name="p1_q7" value="액체"> <span>액체</span></label>
+                    <label><input type="radio" name="p1_q7" value="플라스마"> <span>플라스마</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="지구 복사" data-type="fill" data-explanation="<strong>[심화]</strong> 대류권에서는 높이 올라갈수록 지표에서 방출되는 <strong>지구 복사</strong> 에너지가 적게 도달하기 때문에 기온이 점차 낮아집니다. 이로 인해 대류 현상이 활발하게 일어납니다. (교과서 p.106 대류권 설명 및 기온 분포 원리 참조)">
+                <p><span class="advanced-marker">[심화]</span> 8. 대류권에서는 높이 올라갈수록 지표에서 방출되는 ( ) 에너지가 적게 도달하여 기온이 낮아진다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p1_q8" value="태양 복사"> <span>태양 복사</span></label>
+                    <label><input type="radio" name="p1_q8" value="지구 복사"> <span>지구 복사</span></label>
+                    <label><input type="radio" name="p1_q8" value="우주 복사"> <span>우주 복사</span></label>
+                    <label><input type="radio" name="p1_q8" value="달 복사"> <span>달 복사</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="O" data-type="ox" data-explanation="<strong>[심화]</strong> 성층권에 존재하는 오존층은 태양의 자외선을 흡수하여 성층권의 기온을 높이는 역할을 합니다. 만약 오존층이 파괴되면 지표에 도달하는 자외선 양이 증가하여 피부암 발생률 증가, 백내장, 면역 기능 저하, 농작물 및 해양 생태계 파괴 등 심각한 문제를 일으킬 수 있습니다. (교과서 p.106 성층권, 오존층 설명 및 환경 문제 연관)">
+                <p><span class="advanced-marker">[심화]</span> 9. 오존층 파괴 시 지표에 도달하는 자외선 양이 증가하여 피부암 발생률 증가, 농작물 생육 저해 등의 문제가 발생할 수 있다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p1_q9" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p1_q9" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="O" data-type="ox" data-explanation="중간권에서는 대류 현상이 일어나지만 수증기가 거의 없어 기상 현상은 나타나지 않으며, 유성이 관측되기도 합니다. (교과서 p.106 중간권 설명 참조)">
+                <p>10. 중간권에서는 유성이 관측되기도 한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p1_q10" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p1_q10" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <button class="page-score-button" onclick="scoreCurrentPage(1)">이번 페이지 채점하기</button>
+            <div class="page-score-display" id="page-score-1">점수: 0 / 10</div>
+        </div>
+
+        <div class="question-page" id="page-2">
+            <h2>Ⅰ. 지구시스템의 구성과 상호작용 (2/3)</h2>
+            <h3>기본 개념</h3>
+            <div class="question" data-correct-answer="O" data-type="ox" data-explanation="열권은 공기가 매우 희박하여 낮에는 태양 복사 에너지를 강하게 흡수해 기온이 매우 높고, 밤에는 빠르게 냉각되어 기온이 매우 낮아져 밤낮의 기온 차가 매우 큽니다. (교과서 p.106 열권 설명 참조)">
+                <p>11. 열권은 밤과 낮의 기온 차가 매우 크게 나타난다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p2_q1" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p2_q1" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="X" data-type="ox" data-explanation="<strong>틀렸습니다.</strong> 맨틀은 고체 상태이지만 유동성이 있어 매우 느리게 움직이며 대류 현상이 일어납니다. (교과서 p.106 맨틀 설명 참조)">
+                <p>12. 맨틀은 액체 상태로 유동성이 없다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p2_q2" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p2_q2" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="지구시스템" data-type="fill" data-explanation="<strong>지구시스템</strong>은 지구를 구성하는 여러 요소(기권, 수권, 지권, 생물권 등)들이 서로 영향을 주고받으며 상호작용하는 하나의 통합된 시스템을 의미합니다.">
+                <p>13. 지구는 생명체를 비롯하여 여러 요소가 서로 영향을 주고받으면서 시스템을 이루고 있는데, 이를 ( )이라고 한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p2_q3" value="태양계"> <span>태양계</span></label>
+                    <label><input type="radio" name="p2_q3" value="생태계"> <span>생태계</span></label>
+                    <label><input type="radio" name="p2_q3" value="지구시스템"> <span>지구시스템</span></label>
+                    <label><input type="radio" name="p2_q3" value="우주"> <span>우주</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="대류권, 성층권, 중간권, 열권" data-type="fill" data-explanation="기권은 높이에 따른 기온 분포 변화를 기준으로 지표면으로부터 <strong>대류권, 성층권, 중간권, 열권</strong>의 네 개의 층으로 구분합니다. (교과서 p.106 기권 그림 Ⅲ-2 참조)">
+                <p>14. 기권은 높이에 따른 기온 분포를 기준으로 ( ), ( ), ( ), ( )으로 구분한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p2_q4" value="대류권, 성층권, 중간권, 열권"> <span>대류권, 성층권, 중간권, 열권</span></label>
+                    <label><input type="radio" name="p2_q4" value="내핵, 외핵, 맨틀, 지각"> <span>내핵, 외핵, 맨틀, 지각</span></label>
+                    <label><input type="radio" name="p2_q4" value="혼합층, 수온약층, 심해층"> <span>혼합층, 수온약층, 심해층</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="오존층" data-type="fill" data-explanation="<strong>오존층</strong>은 성층권 내 높이 약 20~30km 부근에 오존(O₃)이 밀집되어 있는 층으로, 태양으로부터 오는 해로운 자외선을 흡수하여 지표의 생명체를 보호합니다. (교과서 p.106 성층권 설명 참조)">
+                <p>15. 성층권의 높이 20km~30km 부근에는 ( )이 형성되어 있다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p2_q5" value="전리층"> <span>전리층</span></label>
+                    <label><input type="radio" name="p2_q5" value="오로라"> <span>오로라</span></label>
+                    <label><input type="radio" name="p2_q5" value="오존층"> <span>오존층</span></label>
+                    <label><input type="radio" name="p2_q5" value="구름"> <span>구름</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="안정" data-type="fill" data-explanation="<strong>[심화]</strong> 해수의 혼합층 아래 수온이 급격히 낮아지는 수온 약층은 위쪽의 따뜻한 물과 아래쪽의 차가운 물 사이에 위치하여 밀도 차이로 인해 매우 <strong>안정</strong>한 층을 이룹니다. 이 안정성 때문에 혼합층과 심해층 사이의 물질 및 에너지 교환이 활발하게 일어나지 못하게 됩니다. (교과서 p.107 수온 약층 설명 참조)">
+                <p><span class="advanced-marker">[심화]</span> 16. 해수의 혼합층 아래 수온이 급격히 낮아지는 수온 약층은 매우 ( )한 층으로, 혼합층과 심해층 사이의 물질 및 에너지 교환을 억제한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p2_q6" value="불안정"> <span>불안정</span></label>
+                    <label><input type="radio" name="p2_q6" value="안정"> <span>안정</span></label>
+                    <label><input type="radio" name="p2_q6" value="혼합"> <span>혼합</span></label>
+                    <label><input type="radio" name="p2_q6" value="대류"> <span>대류</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="X" data-type="ox" data-explanation="<strong>[심화] 틀렸습니다.</strong> 탄소 순환 과정에서 기권의 이산화탄소가 해수에 용해된 후 탄산염(주로 탄산칼슘)으로 침전되어 지권(해저 퇴적물, 석회암 등)에 저장되는 과정은 수백만 년 이상 걸리는 매우 <strong>느린</strong> 속도로 일어납니다. 반면, 생물의 호흡이나 광합성을 통한 탄소 이동은 상대적으로 빠릅니다. (교과서 p.109 탄소의 순환 및 분포 참조)">
+                <p><span class="advanced-marker">[심화]</span> 17. 탄소 순환 과정에서 기권의 이산화탄소가 해수에 용해된 후 탄산염으로 침전되어 지권에 저장되는 과정은 매우 빠른 속도로 일어난다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p2_q7" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p2_q7" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="지각, 맨틀, 외핵, 내핵" data-type="fill" data-explanation="지권은 지구 내부 구조에 따라 바깥쪽부터 <strong>지각, 맨틀, 외핵, 내핵</strong>의 층상 구조로 이루어져 있습니다.">
+                <p>18. 지권은 암석이나 토양으로 이루어진 지구의 겉 부분과 지구 내부를 포함하며 ( ), ( ), ( ), ( )으로 구분한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p2_q8" value="대륙, 해양, 산맥, 평야"> <span>대륙, 해양, 산맥, 평야</span></label>
+                    <label><input type="radio" name="p2_q8" value="지각, 맨틀, 외핵, 내핵"> <span>지각, 맨틀, 외핵, 내핵</span></label>
+                    <label><input type="radio" name="p2_q8" value="암석권, 연약권, 수권, 기권"> <span>암석권, 연약권, 수권, 기권</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="유동성" data-type="fill" data-explanation="맨틀은 고체 상태이지만 부분적으로 녹아있어 <strong>유동성</strong>을 가지며, 이로 인해 매우 느리게 대류하면서 판의 이동을 일으키는 원동력이 됩니다. (교과서 p.106 맨틀 설명 참조)">
+                <p>19. 맨틀은 지구 전체 부피의 대부분을 차지하고 있으며, 고체 상태이지만 ( )이 있어 오랜 시간에 걸쳐 서서히 움직인다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p2_q9" value="탄성"> <span>탄성</span></label>
+                    <label><input type="radio" name="p2_q9" value="전도성"> <span>전도성</span></label>
+                    <label><input type="radio" name="p2_q9" value="유동성"> <span>유동성</span></label>
+                    <label><input type="radio" name="p2_q9" value="자성"> <span>자성</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="X" data-type="ox" data-explanation="<strong>틀렸습니다.</strong> 혼합층의 두께는 바람이 강하게 불수록 두꺼워집니다. 바람에 의해 해수면 부근의 물이 활발하게 섞이기 때문입니다.">
+                <p>20. 혼합층의 두께는 바람이 강하게 불수록 얇아진다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p2_q10" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p2_q10" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <button class="page-score-button" onclick="scoreCurrentPage(2)">이번 페이지 채점하기</button>
+            <div class="page-score-display" id="page-score-2">점수: 0 / 10</div>
+        </div>
+
+        <div class="question-page" id="page-3">
+            <h2>Ⅰ. 지구시스템의 구성과 상호작용 (3/3)</h2>
+             <h3>기본 개념</h3>
+            <div class="question" data-correct-answer="O" data-type="ox" data-explanation="심해층은 태양 에너지가 거의 도달하지 못하는 깊은 바다로, 수온이 매우 낮고 계절이나 깊이에 따른 변화가 거의 없습니다.">
+                <p>21. 심해층은 태양 에너지가 거의 도달하지 않아 수온이 매우 낮고 변화가 거의 없다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p3_q1" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p3_q1" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="X" data-type="ox" data-explanation="<strong>틀렸습니다.</strong> 생명체는 지권의 표면뿐만 아니라 수권의 깊은 바닷속, 기권의 높은 하늘에 이르기까지 매우 넓은 영역에 걸쳐 분포합니다.">
+                <p>22. 생명체는 지권의 표면에만 분포한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p3_q2" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p3_q2" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="X" data-type="ox" data-explanation="<strong>틀렸습니다.</strong> 물의 순환 과정에서는 물이라는 물질이 이동할 뿐만 아니라, 상태 변화(증발, 응결 등) 과정에서 에너지의 흡수와 방출이 함께 일어나 에너지의 흐름도 발생합니다.">
+                <p>23. 물의 순환 과정에서는 에너지의 흐름은 일어나지 않는다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p3_q3" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p3_q3" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="X" data-type="ox" data-explanation="<strong>틀렸습니다.</strong> 탄소는 지구시스템 내에서 다양한 형태로 존재하며, 분포량이 가장 많은 곳은 지권의 암석(특히 석회암)입니다. (교과서 p.109 탄소의 분포 참조)">
+                <p>24. 탄소의 분포량이 가장 많은 곳은 기권이다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p3_q4" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p3_q4" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="붕괴열" data-type="fill" data-explanation="<strong>[심화]</strong> 지구 내부 에너지는 지구 내부에 포함된 우라늄(U), 토륨(Th), 칼륨(K)과 같은 방사성 원소들이 자연적으로 붕괴하면서 발생하는 열(<strong>붕괴열</strong>)과 지구가 처음 형성될 때 미행성체들의 충돌 및 중력 수축으로 인해 발생했던 초기 열에너지로 구성됩니다. (교과서 p.108 지구 내부 에너지 설명 참조)">
+                <p><span class="advanced-marker">[심화]</span> 25. 지구 내부 에너지는 방사성 원소의 ( )과 지구 형성 초기의 열에너지로 구성된다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p3_q5" value="핵융합열"> <span>핵융합열</span></label>
+                    <label><input type="radio" name="p3_q5" value="붕괴열"> <span>붕괴열</span></label>
+                    <label><input type="radio" name="p3_q5" value="마찰열"> <span>마찰열</span></label>
+                    <label><input type="radio" name="p3_q5" value="전도열"> <span>전도열</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="지진대, 화산대" data-type="fill" data-explanation="지진이 자주 발생하는 지역을 <strong>지진대</strong>, 화산 활동이 자주 발생하는 지역을 <strong>화산대</strong>라고 하며, 이들은 주로 판의 경계와 일치하는 경향을 보입니다.">
+                <p>26. 지진이 자주 발생하는 지역을 ( ), 화산 활동이 자주 발생하는 지역을 ( )(이)라고 한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p3_q6" value="단층대, 습곡대"> <span>단층대, 습곡대</span></label>
+                    <label><input type="radio" name="p3_q6" value="지진대, 화산대"> <span>지진대, 화산대</span></label>
+                    <label><input type="radio" name="p3_q6" value="해령, 해구"> <span>해령, 해구</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="암석권" data-type="fill" data-explanation="<strong>암석권</strong>은 지각과 맨틀의 최상부 일부를 포함하는 단단한 암석층으로, 여러 개의 판으로 이루어져 있습니다.">
+                <p>27. 지각과 맨틀의 윗부분을 포함해 단단한 암석으로 이루어진 부분을 ( )(이)라고 한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p3_q7" value="연약권"> <span>연약권</span></label>
+                    <label><input type="radio" name="p3_q7" value="지각"> <span>지각</span></label>
+                    <label><input type="radio" name="p3_q7" value="암석권"> <span>암석권</span></label>
+                    <label><input type="radio" name="p3_q7" value="맨틀"> <span>맨틀</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+             <div class="question" data-correct-answer="연약권" data-type="fill" data-explanation="<strong>연약권</strong>은 암석권 아래에 위치하며, 맨틀 물질이 부분적으로 녹아 유동성을 가지는 부분입니다. 연약권의 대류가 판을 움직이는 원동력이 됩니다.">
+                <p>28. 암석권 아래에 있는 맨틀 물질의 일부가 녹아 유동성을 띠는 부분을 ( )(이)라고 한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p3_q8" value="암석권"> <span>암석권</span></label>
+                    <label><input type="radio" name="p3_q8" value="연약권"> <span>연약권</span></label>
+                    <label><input type="radio" name="p3_q8" value="외핵"> <span>외핵</span></label>
+                    <label><input type="radio" name="p3_q8" value="내핵"> <span>내핵</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="얇고, 커서" data-type="fill" data-explanation="<strong>[심화]</strong> 해양판은 주로 현무암질 암석으로 이루어져 대륙판(주로 화강암질)보다 평균 두께가 <strong>얇고</strong> 밀도가 <strong>커서</strong>, 수렴형 경계에서 밀도가 작은 대륙판 아래로 쉽게 섭입합니다. (교과서 p.113 대륙판과 해양판 설명 참조)">
+                <p><span class="advanced-marker">[심화]</span> 29. 해양판은 대륙판보다 평균 두께가 ( ) 밀도가 ( ) 수렴형 경계에서 주로 대륙판 아래로 섭입한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p3_q9" value="두껍고, 작아서"> <span>두껍고, 작아서</span></label>
+                    <label><input type="radio" name="p3_q9" value="얇고, 커서"> <span>얇고, 커서</span></label>
+                    <label><input type="radio" name="p3_q9" value="얇고, 작아서"> <span>얇고, 작아서</span></label>
+                    <label><input type="radio" name="p3_q9" value="두껍고, 커서"> <span>두껍고, 커서</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="현무" data-type="fill" data-explanation="<strong>[심화]</strong> 발산형 경계인 해령의 정상부에서는 맨틀 물질이 상승하여 감압 용융되어 생성된 <strong>현무</strong>암질 마그마가 분출하여 새로운 해양 지각(해양판)을 지속적으로 형성합니다. (교과서 p.113 발산형 경계 설명 및 암석 성분 연관)">
+                <p><span class="advanced-marker">[심화]</span> 30. 발산형 경계인 해령의 정상부에서는 주로 ( )암질 마그마가 분출하여 새로운 해양 지각을 형성한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p3_q10" value="화강"> <span>화강</span></label>
+                    <label><input type="radio" name="p3_q10" value="안산"> <span>안산</span></label>
+                    <label><input type="radio" name="p3_q10" value="유문"> <span>유문</span></label>
+                    <label><input type="radio" name="p3_q10" value="현무"> <span>현무</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <button class="page-score-button" onclick="scoreCurrentPage(3)">이번 페이지 채점하기</button>
+            <div class="page-score-display" id="page-score-3">점수: 0 / 10</div>
+        </div>
+
+        <div class="question-page" id="page-4">
+            <h2>Ⅱ. 지권의 변화와 판 구조론 (1/2)</h2> <h3>기본 개념</h3>
+             <div class="question" data-correct-answer="판 구조론" data-type="fill" data-explanation="<strong>판 구조론</strong>은 지구의 암석권이 여러 개의 판으로 이루어져 있고, 이 판들이 맨틀 대류에 의해 이동하면서 판의 경계에서 지진, 화산 활동, 산맥 형성 등 다양한 지각 변동이 일어난다는 이론입니다.">
+                <p>31. 판의 운동에 의해 판의 경계에서 지진이나 화산 활동 등이 일어난다는 이론을 ( )(이)라고 한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p4_q1" value="대륙 이동설"> <span>대륙 이동설</span></label>
+                    <label><input type="radio" name="p4_q1" value="맨틀 대류설"> <span>맨틀 대류설</span></label>
+                    <label><input type="radio" name="p4_q1" value="판 구조론"> <span>판 구조론</span></label>
+                    <label><input type="radio" name="p4_q1" value="지구 공동설"> <span>지구 공동설</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="발산형, 보존형, 수렴형" data-type="fill" data-explanation="판의 경계는 두 판의 상대적인 이동 방향에 따라, 서로 멀어지는 <strong>발산형 경계</strong>, 서로 스쳐 지나가는 <strong>보존형 경계</strong>, 서로 가까워지는 <strong>수렴형 경계</strong>로 구분됩니다.">
+                <p>32. 판의 경계는 상대적인 이동 방향에 따라 ( ) 경계, ( ) 경계, ( ) 경계로 구분한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p4_q2" value="상승형, 하강형, 수평형"> <span>상승형, 하강형, 수평형</span></label>
+                    <label><input type="radio" name="p4_q2" value="발산형, 보존형, 수렴형"> <span>발산형, 보존형, 수렴형</span></label>
+                    <label><input type="radio" name="p4_q2" value="충돌형, 분리형, 마찰형"> <span>충돌형, 분리형, 마찰형</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="발산형" data-type="fill" data-explanation="<strong>발산형 경계</strong>는 두 판이 서로 멀어지는 곳으로, 맨틀 물질이 상승하여 새로운 해양 지각을 형성합니다. 대표적으로 해령이 있습니다.">
+                <p>33. 두 판이 서로 멀어지는 경계로, 새로운 지각이 생성되는 곳은 ( ) 경계이다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p4_q3" value="수렴형"> <span>수렴형</span></label>
+                    <label><input type="radio" name="p4_q3" value="보존형"> <span>보존형</span></label>
+                    <label><input type="radio" name="p4_q3" value="발산형"> <span>발산형</span></label>
+                    <label><input type="radio" name="p4_q3" value="섭입형"> <span>섭입형</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="해령, 열곡대" data-type="fill" data-explanation="발산형 경계에서는 해저에서 마그마가 분출하여 기다란 해저 산맥인 <strong>해령</strong>이 형성되고, 대륙에서 판이 갈라질 때는 V자 모양의 깊은 골짜기인 <strong>열곡대</strong>가 발달합니다.">
+                <p>34. 발산형 경계에서는 해저 산맥인 ( )이나/와 ( )가/이 형성된다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p4_q4" value="해구, 호상열도"> <span>해구, 호상열도</span></label>
+                    <label><input type="radio" name="p4_q4" value="습곡산맥, 변환단층"> <span>습곡산맥, 변환단층</span></label>
+                    <label><input type="radio" name="p4_q4" value="해령, 열곡대"> <span>해령, 열곡대</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="보존형" data-type="fill" data-explanation="<strong>보존형 경계</strong>는 두 판이 서로 스쳐 지나가는 경계로, 판의 생성이나 소멸 없이 지진만 주로 발생합니다. 변환 단층이 대표적입니다.">
+                <p>35. 서로 접해 있는 두 판이 어긋나게 이동하는 경계로, 판의 생성이나 소멸이 일어나지 않는 곳은 ( ) 경계이다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p4_q5" value="발산형"> <span>발산형</span></label>
+                    <label><input type="radio" name="p4_q5" value="수렴형"> <span>수렴형</span></label>
+                    <label><input type="radio" name="p4_q5" value="보존형"> <span>보존형</span></label>
+                    <label><input type="radio" name="p4_q5" value="충돌형"> <span>충돌형</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="O" data-type="ox" data-explanation="<strong>[심화]</strong> 대륙판과 대륙판이 충돌하는 대표적인 수렴형 경계인 히말라야 산맥에서는 두꺼운 대륙 지각이 서로 충돌하고 밀려 올라가 매우 높은 습곡 산맥을 형성합니다. 이 과정에서 마그마가 형성되기 어려워 화산 활동은 거의 일어나지 않지만, 강력한 지각 변동으로 인해 지진은 자주 발생합니다. (교과서 p.114 히말라야산맥 설명 참조)">
+                <p><span class="advanced-marker">[심화]</span> 36. 대륙판과 대륙판이 충돌하는 수렴형 경계(예: 히말라야 산맥)에서는 화산 활동이 거의 일어나지 않는다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p4_q6" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p4_q6" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="천발" data-type="fill" data-explanation="<strong>[심화]</strong> 보존형 경계인 변환 단층에서는 판이 수평으로 어긋나면서 마찰에 의해 지진이 발생합니다. 판의 생성이나 소멸이 없고, 마그마 활동도 거의 없으므로 화산은 잘 발생하지 않으며, 지진은 주로 깊이가 얕은 <strong>천발</strong> 지진이 발생합니다. (교과서 p.113 보존형 경계, p.115 산안드레아스 단층 설명 참조)">
+                <p><span class="advanced-marker">[심화]</span> 37. 보존형 경계인 변환 단층에서는 판의 생성이나 소멸 없이 ( ) 지진이 자주 발생한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p4_q7" value="심발"> <span>심발</span></label>
+                    <label><input type="radio" name="p4_q7" value="중발"> <span>중발</span></label>
+                    <label><input type="radio" name="p4_q7" value="천발"> <span>천발</span></label>
+                    <label><input type="radio" name="p4_q7" value="인공"> <span>인공</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="X" data-type="ox" data-explanation="<strong>틀렸습니다.</strong> 지진대와 화산대는 전 세계에 고르게 분포하는 것이 아니라, 주로 판의 경계를 따라 좁고 긴 띠 모양으로 분포합니다.">
+                <p>38. 지진대와 화산대는 전 세계에 고르게 분포한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p4_q8" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p4_q8" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="O" data-type="ox" data-explanation="연약권은 부분적으로 용융되어 유동성을 가지며, 상부와 하부의 온도 차이로 인해 맨틀 물질이 천천히 대류하는 현상이 일어납니다. 이 맨틀 대류가 판 이동의 원동력으로 작용합니다.">
+                <p>39. 연약권에서는 맨틀 대류가 일어난다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p4_q9" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p4_q9" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+             <div class="question" data-correct-answer="X" data-type="ox" data-explanation="<strong>틀렸습니다.</strong> 대륙판은 해양판보다 두께가 두껍고, 밀도는 작습니다. 해양판은 주로 현무암질 암석으로, 대륙판은 주로 화강암질 암석으로 이루어져 이러한 차이가 나타납니다. (교과서 p.113 대륙판과 해양판 설명 참조)">
+                <p>40. 대륙판은 해양판보다 두께가 얇고 밀도가 크다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p4_q10" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p4_q10" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <button class="page-score-button" onclick="scoreCurrentPage(4)">이번 페이지 채점하기</button>
+            <div class="page-score-display" id="page-score-4">점수: 0 / 10</div>
+        </div>
+
+        <div class="question-page" id="page-5">
+            <h2>Ⅱ. 지권의 변화와 판 구조론 (2/2)</h2> <h3>기본 개념</h3>
+            <div class="question" data-correct-answer="X" data-type="ox" data-explanation="<strong>틀렸습니다.</strong> 발산형 경계에서는 두 판이 서로 멀어지면서 마그마가 상승하여 새로운 해양 지각이 생성됩니다. 판이 소멸하는 곳은 수렴형 경계입니다.">
+                <p>41. 발산형 경계에서는 판이 소멸한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p5_q1" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p5_q1" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="X" data-type="ox" data-explanation="<strong>틀렸습니다.</strong> 보존형 경계에서는 두 판이 서로 스쳐 지나가기 때문에 판의 생성이나 소멸이 일어나지 않으며, 주로 천발 지진이 발생하고 화산 활동은 거의 일어나지 않습니다.">
+                <p>42. 보존형 경계에서는 화산 활동이 매우 활발하게 일어난다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p5_q2" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p5_q2" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="수렴형" data-type="fill" data-explanation="<strong>수렴형 경계</strong>는 두 판이 서로 가까워지면서 충돌하거나 한 판이 다른 판 아래로 섭입하여 판이 소멸하는 경계입니다. 해구나 습곡 산맥 등이 형성됩니다.">
+                <p>43. 두 판이 서로 가까워지는 경계로, 판이 소멸하는 곳은 ( ) 경계이다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p5_q3" value="보존형"> <span>보존형</span></label>
+                    <label><input type="radio" name="p5_q3" value="발산형"> <span>발산형</span></label>
+                    <label><input type="radio" name="p5_q3" value="분리형"> <span>분리형</span></label>
+                    <label><input type="radio" name="p5_q3" value="수렴형"> <span>수렴형</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="습곡 산맥, 해구, 호상열도" data-type="fill" data-explanation="수렴형 경계에서는 판의 충돌 유형에 따라 높은 <strong>습곡 산맥</strong>(대륙판-대륙판 충돌), 깊은 골짜기인 <strong>해구</strong>와 그 주변의 <strong>호상열도</strong>(해양판 섭입) 등이 형성됩니다.">
+                <p>44. 수렴형 경계에서는 ( ), ( ), ( ) 등이 형성된다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p5_q4" value="열곡대, 해령, 변환단층"> <span>열곡대, 해령, 변환단층</span></label>
+                    <label><input type="radio" name="p5_q4" value="습곡 산맥, 해구, 호상열도"> <span>습곡 산맥, 해구, 호상열도</span></label>
+                    <label><input type="radio" name="p5_q4" value="정단층, 역단층, 주향이동단층"> <span>정단층, 역단층, 주향이동단층</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="하강" data-type="fill" data-explanation="<strong>[심화]</strong> 대규모 화산 폭발 시 분출된 다량의 화산재와 화산 가스가 성층권까지 올라가 햇빛을 차단하면, 지표에 도달하는 태양 에너지양이 감소하여 지구 전체의 평균 기온이 일시적으로 <strong>하강</strong>하는 현상이 나타날 수 있습니다. (교과서 p.117 화산 활동 영향 참조)">
+                <p><span class="advanced-marker">[심화]</span> 45. 화산 활동으로 분출된 화산재가 햇빛을 가리면 지구 전체의 평균 기온이 일시적으로 ( )될 수 있다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p5_q5" value="상승"> <span>상승</span></label>
+                    <label><input type="radio" name="p5_q5" value="하강"> <span>하강</span></label>
+                    <label><input type="radio" name="p5_q5" value="유지"> <span>유지</span></label>
+                    <label><input type="radio" name="p5_q5" value="급변"> <span>급변</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="X" data-type="ox" data-explanation="<strong>[심화] 틀렸습니다.</strong> 해양판이 대륙판 아래로 섭입하는 수렴형 경계(예: 안데스 산맥)에서는 마그마가 형성되어 화산 활동이 활발하게 일어나며, 동시에 판의 충돌로 인해 습곡 산맥도 형성됩니다. (교과서 p.114 안데스산맥 설명 참조)">
+                <p><span class="advanced-marker">[심화]</span> 46. 해양판이 대륙판 아래로 섭입하는 수렴형 경계에서는 습곡 산맥은 형성되지만 화산 활동은 일어나지 않는다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p5_q6" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p5_q6" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="X" data-type="ox" data-explanation="<strong>틀렸습니다.</strong> 동태평양 해령은 태평양판과 나스카판 등이 서로 멀어지는 발산형 경계에 해당하며, 새로운 해양 지각이 생성되는 곳입니다.">
+                <p>47. 동태평양 해령은 수렴형 경계에 해당한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p5_q7" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p5_q7" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="O" data-type="ox" data-explanation="해저에서 지진이 발생하면 거대한 해일(지진 해일, 쓰나미)이 발생하여 해안 지역에 막대한 인명 및 재산 피해를 줄 수 있습니다.">
+                <p>48. 지진 해일은 해저 지진으로 발생하며, 해안 지역에 큰 피해를 줄 수 있다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p5_q8" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p5_q8" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="X" data-type="ox" data-explanation="<strong>틀렸습니다.</strong> 화산 활동은 용암 분출, 화산재 등으로 피해를 주기도 하지만, 화산 지형은 관광 자원이 되고 화산 분출물이 풍화된 토양은 비옥하여 농사에 유리하며, 지열 발전 등 긍정적인 영향도 있습니다.">
+                <p>49. 화산 활동은 항상 지구시스템에 부정적인 영향만 준다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p5_q9" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p5_q9" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <div class="question" data-correct-answer="O" data-type="ox" data-explanation="화산 활동으로 분출된 화산재나 용암 등이 오랜 시간 풍화 작용을 받으면 다양한 무기 염류를 포함한 비옥한 토양으로 변하여 농경에 유리한 환경을 제공하기도 합니다.">
+                <p>50. 화산 분출물이 풍화를 받으면 비옥한 토양을 만들기도 한다.</p>
+                <div class="options">
+                    <label><input type="radio" name="p5_q10" value="O"> <span>O</span></label>
+                    <label><input type="radio" name="p5_q10" value="X"> <span>X</span></label>
+                </div>
+                <div class="answer-feedback"></div><div class="detailed-explanation"></div>
+            </div>
+            <button class="page-score-button" onclick="scoreCurrentPage(5)">이번 페이지 채점하기</button>
+            <div class="page-score-display" id="page-score-5">점수: 0 / 10</div>
+        </div>
+
+
+        <div class="pagination-controls">
+            <button id="prev-page-btn" onclick="changePage(-1)" disabled>이전 페이지</button>
+            <span class="page-info" id="page-indicator">Page 1 / 5</span> <button id="next-page-btn" onclick="changePage(1)">다음 페이지</button>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const totalPages = 5; // 총 페이지 수 5로 변경
+        const pageScoredStatus = {};
+
+        // HTML 주석 수정: {/**/} -> // (스크립트 내에서는 주석 방식이 다르므로 JS 주석은 그대로 둡니다.)
+
+        document.querySelectorAll('.options label').forEach(label => {
+            label.addEventListener('click', function() {
+                const questionDiv = this.closest('.question');
+                const questionAlreadyScored = pageScoredStatus[currentPage] || false;
+
+                if (!questionAlreadyScored) {
+                    questionDiv.querySelectorAll('.options label').forEach(lbl => {
+                        lbl.classList.remove('selected-by-user');
+                    });
+                    this.classList.add('selected-by-user');
+                }
+            });
+        });
+
+        function updateNavbarActiveState(pageNumber) {
+            document.querySelectorAll('#quiz-navbar button').forEach(navBtn => {
+                navBtn.classList.remove('active-nav');
+                if (parseInt(navBtn.dataset.page) === pageNumber) {
+                    navBtn.classList.add('active-nav');
+                }
+            });
+        }
+
+        function displayPage(pageNumber) {
+            document.querySelectorAll('.question-page').forEach(page => {
+                page.classList.remove('active');
+            });
+            const targetPage = document.getElementById(`page-${pageNumber}`);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            document.getElementById('prev-page-btn').disabled = (pageNumber === 1);
+            document.getElementById('next-page-btn').disabled = (pageNumber === totalPages);
+            document.getElementById('page-indicator').textContent = `Page ${pageNumber} / ${totalPages}`;
+
+            const scoreButton = targetPage.querySelector('.page-score-button');
+            if (scoreButton) {
+                scoreButton.disabled = pageScoredStatus[pageNumber] || false;
+            }
+            updateNavbarActiveState(pageNumber);
+        }
+
+        function navigateToPage(pageNumber) {
+            currentPage = pageNumber;
+            displayPage(currentPage);
+            const navbarHeight = document.getElementById('quiz-navbar').offsetHeight || 60;
+            const containerElement = document.querySelector('.container');
+            if (containerElement) {
+                 window.scrollTo({
+                     top: containerElement.offsetTop - navbarHeight - 10,
+                     behavior: 'smooth'
+                 });
+            }
+        }
+
+        function changePage(direction) {
+            const newPage = currentPage + direction;
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                displayPage(currentPage);
+                 const navbarHeight = document.getElementById('quiz-navbar').offsetHeight || 60;
+                 const containerElement = document.querySelector('.container');
+                 if (containerElement) {
+                    window.scrollTo({
+                        top: containerElement.offsetTop - navbarHeight - 10,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        }
+
+        function scoreCurrentPage(pageNumber) {
+            let score = 0;
+            const currentPageElement = document.getElementById(`page-${pageNumber}`);
+            if (!currentPageElement) return;
+
+            const questionsOnPage = currentPageElement.querySelectorAll('.question');
+            let allAnswered = true;
+
+            questionsOnPage.forEach(question => {
+                const correctAnswer = question.dataset.correctAnswer;
+                const explanationText = question.dataset.explanation;
+                const feedbackElement = question.querySelector('.answer-feedback');
+                const explanationDiv = question.querySelector('.detailed-explanation');
+                let userAnswer = null;
+
+                question.classList.remove('correct-q', 'incorrect-q');
+                feedbackElement.textContent = '';
+                if(explanationDiv) {
+                    explanationDiv.innerHTML = '';
+                    explanationDiv.style.display = 'none';
+                }
+                question.querySelectorAll('.options label').forEach(lbl => {
+                    lbl.classList.remove('actual-correct-option');
+                });
+
+                for (const radioButton of question.querySelectorAll('input[type="radio"]')) {
+                    if (radioButton.checked) {
+                        userAnswer = radioButton.value;
+                        break;
+                    }
+                }
+
+                if (userAnswer === null) {
+                    allAnswered = false;
+                } else {
+                    if (userAnswer === correctAnswer) {
+                        score++;
+                        question.classList.add('correct-q');
+                        feedbackElement.textContent = "정답입니다! 👍";
+                    } else {
+                        question.classList.add('incorrect-q');
+                        feedbackElement.textContent = `오답입니다. 정답: ${correctAnswer}`;
+                        question.querySelectorAll('.options label').forEach(lbl => {
+                            if (lbl.querySelector('input[type="radio"]').value === correctAnswer) {
+                                lbl.classList.add('actual-correct-option');
+                            }
+                        });
+                    }
+                    if (explanationDiv && explanationText) {
+                        explanationDiv.innerHTML = explanationText; // 해설 내용에 HTML 태그가 포함될 수 있으므로 innerHTML 사용
+                        explanationDiv.style.display = 'block';
+                    }
+                }
+            });
+
+            if (!allAnswered) {
+                alert("현재 페이지의 모든 문제에 답을 선택해주세요!");
+                return;
+            }
+
+            const scoreDisplay = document.getElementById(`page-score-${pageNumber}`);
+            scoreDisplay.textContent = `점수: ${score} / ${questionsOnPage.length}`;
+
+            pageScoredStatus[pageNumber] = true;
+            const scoreButton = currentPageElement.querySelector('.page-score-button');
+            if (scoreButton) {
+                scoreButton.disabled = true;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const navbarHeight = document.getElementById('quiz-navbar').offsetHeight || 60;
+            document.body.style.paddingTop = navbarHeight + 'px';
+            displayPage(currentPage);
+        });
+    </script>
+</body>
+</html>

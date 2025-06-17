@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>통합과학 퀴즈 - 1.1.1 과학의 기본량</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .correct-answer-text {
+            color: #2ECC71; /* Green */
+        }
+        .wrong-answer-text {
+            color: #E74C3C; /* Red */
+        }
+        .explanation {
+            background-color: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .option-btn.selected {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        .option-btn.correct {
+            background-color: #2ECC71 !important;
+            color: white !important;
+            border-color: #2ECC71 !important;
+        }
+        .option-btn.incorrect {
+            background-color: #E74C3C !important;
+            color: white !important;
+            border-color: #E74C3C !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="max-w-4xl w-full bg-white rounded-lg shadow-xl p-6 md:p-8">
+
+        <header class="mb-6 border-b pb-4">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 text-center">통합과학 퀴즈</h1>
+            <p class="text-center text-gray-500 mt-1">1.1.1 과학의 기초 - 과학의 기본량</p>
+        </header>
+
+        <div id="stats" class="flex justify-between items-center bg-blue-50 rounded-lg p-3 mb-6 text-sm md:text-base">
+            <div>
+                <span class="font-bold">점수:</span>
+                <span id="score" class="font-bold text-blue-600">0</span>
+            </div>
+            <div>
+                <span class="font-bold">진행 상황:</span>
+                <span id="progress" class="font-bold text-gray-700">1 / 15</span>
+            </div>
+        </div>
+
+        <div id="quiz-area">
+            <div id="question-container" class="mb-5">
+                <p id="question" class="text-lg md:text-xl text-gray-900 leading-relaxed"></p>
+            </div>
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                </div>
+            <div id="feedback-container" class="mt-4"></div>
+            <div class="mt-6 flex justify-end">
+                <button id="next-btn" class="bg-blue-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-600 transition duration-200 shadow disabled:bg-gray-400" disabled>
+                    다음 문제
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "1. 물리량은 ( ① )와 방향을 함께 나타내는 물리량과 크기만으로 나타내는 물리량으로 구분할 수 있다.",
+                options: ["크기", "속도", "질량", "시간"],
+                answer: "크기",
+                explanation: "물리량은 크기와 방향을 함께 나타내는 벡터량과, 크기만으로 나타내는 스칼라량으로 구분할 수 있습니다."
+            },
+            {
+                question: "2. 벡터량은 크기와 방향을 모두 나타내야 완전하게 표현되는 물리량이다. (O/X)",
+                options: ["O", "X"],
+                answer: "O",
+                explanation: "벡터량은 크기와 방향을 모두 가지는 물리량입니다. 예: 힘, 속도, 변위"
+            },
+            {
+                question: "3. 스칼라량은 크기만으로 완전하게 표현되는 물리량이다. (O/X)",
+                options: ["O", "X"],
+                answer: "O",
+                explanation: "스칼라량은 크기만 가지고 방향은 없는 물리량입니다. 예: 질량, 시간, 길이, 온도"
+            },
+            {
+                question: "4. 속력, 이동 거리는 ( )에 해당한다.",
+                options: ["벡터량", "스칼라량", "기본량", "유도량"],
+                answer: "스칼라량",
+                explanation: "속력과 이동 거리는 방향을 고려하지 않는 스칼라량입니다."
+            },
+            {
+                question: "5. 속도, 변위, 힘은 ( )에 해당한다.",
+                options: ["벡터량", "스칼라량", "기본량", "유도량"],
+                answer: "벡터량",
+                explanation: "속도, 변위, 힘은 크기와 방향을 모두 고려해야 하는 벡터량입니다."
+            },
+            {
+                question: "6. 물리량을 측정할 때 기준이 되는 단위를 정하고, 이 단위들의 체계를 ( )라고 한다.",
+                options: ["측정 표준", "기본 단위", "단위계", "유도 단위"],
+                answer: "단위계",
+                explanation: "물리량을 측정할 때 기준이 되는 단위를 정하고, 이 단위들의 체계를 단위계라고 합니다."
+            },
+            {
+                question: "7. 현재 전 세계적으로 통용되는 단위계는 ( )이다.",
+                options: ["미국 단위계", "야드-파운드법", "척관법", "국제 단위계(SI)"],
+                answer: "국제 단위계(SI)",
+                explanation: "현재 전 세계적으로 통용되는 단위계는 국제 단위계(SI)입니다."
+            },
+            {
+                question: "8. 국제 단위계(SI)의 기본 단위에는 길이(m), 질량(kg), 시간(s), 온도(K), 전류(A), 광도(cd), 물질의 양(mol)의 7가지가 있다. (O/X)",
+                options: ["O", "X"],
+                answer: "O",
+                explanation: "국제 단위계(SI)는 7개의 기본 단위(m, kg, s, K, A, cd, mol)를 바탕으로 구성됩니다."
+            },
+            {
+                question: "9. 속력, 넓이, 부피의 단위와 같이 기본 단위의 조합으로 표현되는 단위를 ( )라고 한다.",
+                options: ["기본 단위", "유도 단위", "측정 단위", "보조 단위"],
+                answer: "유도 단위",
+                explanation: "속력(m/s), 넓이(m²), 부피(m³)의 단위와 같이 기본 단위의 조합으로 표현되는 단위를 유도 단위라고 합니다."
+            },
+            {
+                question: "10. 국제 단위계에서 길이의 기본 단위는 미터(m)이다. (O/X)",
+                options: ["O", "X"],
+                answer: "O",
+                explanation: "국제 단위계에서 길이의 기본 단위는 미터(m)입니다."
+            },
+            {
+                question: "11. 국제 단위계에서 질량의 기본 단위는 그램(g)이다. (O/X)",
+                options: ["X", "O"],
+                answer: "X",
+                explanation: "국제 단위계에서 질량의 기본 단위는 킬로그램(kg)입니다."
+            },
+            {
+                question: "12. 국제 단위계에서 시간의 기본 단위는 ( )이다.",
+                options: ["분(min)", "시(h)", "초(s)", "밀리초(ms)"],
+                answer: "초(s)",
+                explanation: "국제 단위계에서 시간의 기본 단위는 초(s)입니다."
+            },
+            {
+                question: "13. 1km는 ( )m 이다.",
+                options: ["10", "100", "1000", "10000"],
+                answer: "1000",
+                explanation: "접두어 k(킬로)는 10³을 의미하므로, 1km는 1000m 입니다."
+            },
+            {
+                question: "14. 1cm는 ( )m 이다.",
+                options: ["0.1", "0.01", "0.001", "10"],
+                answer: "0.01",
+                explanation: "접두어 c(센티)는 10⁻²을 의미하므로, 1cm는 0.01m 입니다."
+            },
+            {
+                question: "15. 1t(톤)은 ( )kg 이다.",
+                options: ["10", "100", "1000", "0.1"],
+                answer: "1000",
+                explanation: "1t(톤)은 1000kg에 해당하는 질량 단위입니다. (단, 국제단위계의 기본단위는 kg입니다.)"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedAnswer = null;
+        let answerChecked = false;
+
+        const questionEl = document.getElementById('question');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const nextBtn = document.getElementById('next-btn');
+        const scoreEl = document.getElementById('score');
+        const progressEl = document.getElementById('progress');
+
+        function loadQuestion() {
+            answerChecked = false;
+            selectedAnswer = null;
+            const currentQuestion = questions[currentQuestionIndex];
+            
+            questionEl.innerHTML = currentQuestion.question.replace(/①|②|③|④|⑤/, '<span class="font-bold text-blue-600">(____)</span>');
+
+            optionsContainer.innerHTML = '';
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('option-btn', 'border', 'border-gray-300', 'rounded-lg', 'p-3', 'text-left', 'hover:bg-gray-100', 'transition', 'duration-200');
+                button.onclick = () => selectOption(button, option);
+                optionsContainer.appendChild(button);
+            });
+
+            feedbackContainer.innerHTML = '';
+            nextBtn.disabled = true;
+            updateProgress();
+        }
+
+        function selectOption(button, option) {
+            if (answerChecked) return;
+
+            Array.from(optionsContainer.children).forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            selectedAnswer = option;
+            checkAnswer();
+        }
+        
+        function checkAnswer() {
+            if (answerChecked) return;
+            answerChecked = true;
+            
+            const currentQuestion = questions[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+            
+            if (isCorrect) {
+                score++;
+            }
+            
+            Array.from(optionsContainer.children).forEach(button => {
+                const option = button.textContent;
+                button.disabled = true; 
+                
+                if (option === currentQuestion.answer) {
+                    button.classList.add('correct');
+                } else if (option === selectedAnswer) {
+                    button.classList.add('incorrect');
+                }
+            });
+            
+            feedbackContainer.innerHTML = `
+                <div class="explanation">
+                    <p class="font-bold mb-2">
+                        ${isCorrect ? '<span class="correct-answer-text">정답입니다!</span>' : '<span class="wrong-answer-text">오답입니다.</span>'}
+                    </p>
+                    <p><span class="font-semibold">정답:</span> ${currentQuestion.answer}</p>
+                    <p><span class="font-semibold">해설:</span> ${currentQuestion.explanation}</p>
+                </div>
+            `;
+            
+            updateScore();
+            if (currentQuestionIndex < questions.length - 1) {
+                nextBtn.disabled = false;
+            }
+        }
+
+        function updateScore() {
+            scoreEl.textContent = score;
+        }
+
+        function updateProgress() {
+            progressEl.textContent = `${currentQuestionIndex + 1} / ${questions.length}`;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                quizFinished();
+            }
+        });
+
+        function quizFinished() {
+             document.getElementById('quiz-area').innerHTML = `
+                <div class="text-center p-8">
+                    <h2 class="text-2xl font-bold mb-4">퀴즈 완료!</h2>
+                    <p class="text-xl">최종 점수는 <span class="font-bold text-blue-600">${score}</span>점 / ${questions.length}점 입니다.</p>
+                    <button onclick="location.reload()" class="mt-6 bg-blue-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-600 transition duration-200">
+                        다시 풀기
+                    </button>
+                </div>
+            `;
+        }
+
+
+        // Initial load
+        loadQuestion();
+    </script>
+</body>
+</html>
